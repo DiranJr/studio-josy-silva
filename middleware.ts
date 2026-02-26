@@ -1,21 +1,27 @@
 import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
 
-// Simple middleware to protect /api/crm endpoints
+// Middleware to protect /api/crm and /crm endpoints
 export function middleware(request: NextRequest) {
-    // If accessing /api/crm, require authorization header validation
+    // API Protection
     if (request.nextUrl.pathname.startsWith('/api/crm')) {
         const authHeader = request.headers.get('authorization')
         if (!authHeader || !authHeader.startsWith('Bearer ')) {
             return NextResponse.json({ error: 'Unauthorized middleware' }, { status: 401 })
         }
-        // We cannot easily use edge-incompatible libs (like full jsonwebtoken) in regular middleware without config
-        // For MVP we just assert token is present and starts with Bearer. 
-        // The individual /api/crm/* route handlers will strictly verify the token signature.
     }
+
+    // UI Protection
+    if (request.nextUrl.pathname.startsWith('/crm')) {
+        const token = request.cookies.get('auth-token')
+        if (!token) {
+            return NextResponse.redirect(new URL('/login', request.url))
+        }
+    }
+
     return NextResponse.next()
 }
 
 export const config = {
-    matcher: ['/api/crm/:path*'],
+    matcher: ['/api/crm/:path*', '/crm/:path*'],
 }
