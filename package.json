@@ -4,11 +4,10 @@
   "private": true,
   "scripts": {
     "dev": "next dev -p 3005",
-    "build": "next build",
+    "build": "prisma generate && prisma migrate deploy && prisma db seed && next build",
     "start": "next start -p 3005",
     "lint": "next lint",
-    "test": "vitest",
-    "vercel-build": "prisma generate && prisma migrate deploy && prisma db seed && next build"
+    "test": "vitest"
   },
   "dependencies": {
     "@prisma/client": "^5.14.0",
