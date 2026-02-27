@@ -2,6 +2,8 @@ import prisma from "@/lib/prisma";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 
+export const dynamic = "force-dynamic";
+
 export default async function CRMDashboard() {
     // Basic metrics (in a real app this would be more complex and cached)
     const today = new Date();

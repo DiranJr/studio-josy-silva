@@ -4,6 +4,8 @@ import { ptBR } from "date-fns/locale";
 import CalendarSidebar from "./CalendarSidebar";
 import AppointmentActions from "./AppointmentActions";
 
+export const dynamic = "force-dynamic";
+
 export default async function CRMAppointments({ searchParams }: { searchParams: { date?: string } }) {
     // Basic date parsing from URL or use today
     const queryDateStr = searchParams.date || new Date().toISOString();

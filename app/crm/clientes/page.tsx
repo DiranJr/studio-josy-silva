@@ -1,4 +1,6 @@
 import prisma from "@/lib/prisma";
+
+export const dynamic = "force-dynamic";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import Link from "next/link";
@@ -154,7 +156,7 @@ export default async function CRMClients({ searchParams }: { searchParams: { q?:
                                         {selectedClient.appointments.map(app => (
                                             <div key={app.id} className="p-4 rounded-lg border border-slate-100 dark:border-slate-700 bg-white dark:bg-slate-800">
                                                 <div className="flex justify-between items-start mb-2">
-                                                    <span className="font-semibold text-slate-800 dark:text-slate-200">{app.serviceOption.service.name} <span className="text-xs text-slate-500 font-normal">({app.serviceOption.type === 'APPLICATION' ? 'Aplicação' : 'Manutenção'})</span></span>
+                                                    <span className="font-semibold text-slate-800 dark:text-slate-200">Agendamento</span>
                                                     <span className="text-xs font-semibold px-2 py-0.5 rounded-full bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300">
                                                         {app.status}
                                                     </span>
