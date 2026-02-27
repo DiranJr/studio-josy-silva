@@ -4,10 +4,11 @@
   "private": true,
   "scripts": {
     "dev": "next dev -p 3005",
-    "build": "prisma generate && prisma migrate deploy && prisma db seed && next build",
+    "build": "next build",
     "start": "next start -p 3005",
     "lint": "next lint",
-    "test": "vitest"
+    "test": "vitest",
+    "postinstall": "prisma generate && prisma migrate deploy"
   },
   "dependencies": {
     "@prisma/client": "^5.14.0",
