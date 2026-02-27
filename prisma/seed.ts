@@ -55,12 +55,104 @@ async function main() {
 
     // 5. Services
     const servicesData = [
-        { name: 'Volume Brasileiro', description: 'O clássico que amamos. Fios em formato de Y.', durationMinutes: 120, priceCents: 15000, depositCents: 4000 },
-        { name: 'Volume Egípcio', description: 'Tecnologia em fios W para um olhar mais denso.', durationMinutes: 120, priceCents: 17000, depositCents: 4000 },
-        { name: 'Volume Luxo', description: 'Para quem busca o máximo glamour.', durationMinutes: 150, priceCents: 20000, depositCents: 4000 },
-    ]
-    await prisma.service.createMany({ data: servicesData })
-    console.log('Created services')
+        // CILIOS
+        {
+            name: 'Volume Brasileiro',
+            category: 'Cilios',
+            description: 'O clássico que amamos. Fios em formato de Y.',
+            options: {
+                create: [
+                    { type: 'APPLICATION', durationMinutes: 120, priceCents: 18000, depositCents: 4000 },
+                    { type: 'MAINTENANCE', durationMinutes: 90, priceCents: 10000, depositCents: 4000 }
+                ]
+            }
+        },
+        {
+            name: 'Volume Egípcio',
+            category: 'Cilios',
+            description: 'Tecnologia em fios W para um olhar mais denso.',
+            options: {
+                create: [
+                    { type: 'APPLICATION', durationMinutes: 130, priceCents: 20000, depositCents: 4000 },
+                    { type: 'MAINTENANCE', durationMinutes: 100, priceCents: 12000, depositCents: 4000 }
+                ]
+            }
+        },
+        {
+            name: 'Volume Fox',
+            category: 'Cilios',
+            description: 'Efeito alongado impactante.',
+            options: {
+                create: [
+                    { type: 'APPLICATION', durationMinutes: 140, priceCents: 21000, depositCents: 4000 },
+                    { type: 'MAINTENANCE', durationMinutes: 100, priceCents: 13000, depositCents: 4000 }
+                ]
+            }
+        },
+        {
+            name: 'Volume Luxo',
+            category: 'Cilios',
+            description: 'Para quem busca o máximo glamour.',
+            options: {
+                create: [
+                    { type: 'APPLICATION', durationMinutes: 150, priceCents: 23000, depositCents: 5000 },
+                    { type: 'MAINTENANCE', durationMinutes: 110, priceCents: 14000, depositCents: 5000 }
+                ]
+            }
+        },
+        // OUTROS SERVICOS
+        {
+            name: 'Design Simples',
+            category: 'Outros',
+            description: 'Sobrancelha alinhada',
+            options: {
+                create: [
+                    { type: 'APPLICATION', durationMinutes: 30, priceCents: 2500, depositCents: 0 },
+                    { type: 'MAINTENANCE', durationMinutes: 30, priceCents: 2500, depositCents: 0, active: false }
+                ]
+            }
+        },
+        {
+            name: 'Design com Henna',
+            category: 'Outros',
+            description: 'Design completo com Henna',
+            options: {
+                create: [
+                    { type: 'APPLICATION', durationMinutes: 40, priceCents: 4500, depositCents: 0 },
+                    { type: 'MAINTENANCE', durationMinutes: 40, priceCents: 4500, depositCents: 0, active: false }
+                ]
+            }
+        },
+        {
+            name: 'Epilação de Buço',
+            category: 'Outros',
+            description: 'Remoção de pelo',
+            options: {
+                create: [
+                    { type: 'APPLICATION', durationMinutes: 15, priceCents: 1000, depositCents: 0 },
+                    { type: 'MAINTENANCE', durationMinutes: 15, priceCents: 1000, depositCents: 0, active: false }
+                ]
+            }
+        },
+        {
+            name: 'Brow Lamination',
+            category: 'Outros',
+            description: 'Sobrancelhas disciplinadas e volumosas',
+            options: {
+                create: [
+                    { type: 'APPLICATION', durationMinutes: 60, priceCents: 11000, depositCents: 2000 },
+                    { type: 'MAINTENANCE', durationMinutes: 45, priceCents: 7000, depositCents: 2000 }
+                ]
+            }
+        },
+    ];
+
+    for (const s of servicesData) {
+        await prisma.service.create({
+            data: s
+        });
+    }
+    console.log('Created services with options')
 }
 
 main()

@@ -8,21 +8,21 @@ import { ptBR } from "date-fns/locale";
 function PaymentClient() {
     const router = useRouter();
     const searchParams = useSearchParams();
-    
-    const serviceId = searchParams.get("serviceId");
+
+    const serviceOptionId = searchParams.get("serviceOptionId");
     const dateStr = searchParams.get("date");
     const timeStr = searchParams.get("time");
 
-    const [service, setService] = useState<any>(null);
+    const [serviceOption, setServiceOption] = useState<any>(null);
     const [loading, setLoading] = useState(true);
-    
+
     const [name, setName] = useState("");
     const [phone, setPhone] = useState("");
     const [email, setEmail] = useState("");
     const [isSubmitting, setIsSubmitting] = useState(false);
 
     useEffect(() => {
-        if (!serviceId || !dateStr || !timeStr) {
+        if (!serviceOptionId || !dateStr || !timeStr) {
             router.push("/");
             return;
         }
@@ -30,15 +30,25 @@ function PaymentClient() {
         fetch("/api/public/services")
             .then((res) => res.json())
             .then((data) => {
-                const found = data.find((s: any) => s.id === serviceId);
-                if (found) {
-                    setService(found);
+                let foundOption = null;
+                for (const s of data) {
+                    if (s.options) {
+                        const opt = s.options.find((o: any) => o.id === serviceOptionId);
+                        if (opt) {
+                            foundOption = { ...opt, service: s };
+                            break;
+                        }
+                    }
+                }
+
+                if (foundOption) {
+                    setServiceOption(foundOption);
                 } else {
                     router.push("/");
                 }
                 setLoading(false);
             });
-    }, [serviceId, dateStr, timeStr, router]);
+    }, [serviceOptionId, dateStr, timeStr, router]);
 
     const handleConfirm = async () => {
         if (!name || !phone) {
@@ -49,15 +59,15 @@ function PaymentClient() {
         setIsSubmitting(true);
         try {
             const startAt = new Date(`${dateStr}T${timeStr}:00`);
-            
+
             // We need an endpoint POST /api/public/appointments
-            // I'll assume we send: client: {name, phone, email}, serviceId, startAt
+            // I'll assume we send: client: {name, phone, email}, serviceOptionId, startAt
             const res = await fetch("/api/public/appointments", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({
                     client: { name, phone, email },
-                    serviceId,
+                    serviceOptionId,
                     startAt: startAt.toISOString(),
                 }),
             });
@@ -79,7 +89,7 @@ function PaymentClient() {
     };
 
     if (loading) return <div className="min-h-screen flex items-center justify-center">Carregando...</div>;
-    if (!service) return null;
+    if (!serviceOption) return null;
 
     return (
         <div className="bg-background-light dark:bg-background-dark min-h-screen text-slate-900 dark:text-slate-100 flex flex-col font-display">
@@ -100,7 +110,7 @@ function PaymentClient() {
                         <h2 className="text-slate-900 dark:text-slate-50 text-3xl font-extrabold tracking-tight mb-4">Finalizar Agendamento</h2>
                         <div className="bg-primary/5 inline-block px-6 py-3 rounded-full border border-primary/10 mb-4">
                             <p className="text-primary text-sm md:text-base font-semibold">
-                                {service.name} — <span className="font-bold">Sinal: R$ {(service.depositCents / 100).toFixed(2)}</span>
+                                {serviceOption.service.name} <span className="font-normal">({serviceOption.type === 'APPLICATION' ? 'Aplicação' : 'Manutenção'})</span> — <span className="font-bold">Sinal: R$ {(serviceOption.depositCents / 100).toFixed(2)}</span>
                             </p>
                         </div>
                         <p className="text-sm text-neutral-dark/70 dark:text-slate-400">
@@ -113,8 +123,8 @@ function PaymentClient() {
                             <h3 className="text-lg font-bold">Seus Dados</h3>
                             <div>
                                 <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Nome Completo *</label>
-                                <input 
-                                    type="text" 
+                                <input
+                                    type="text"
                                     value={name}
                                     onChange={e => setName(e.target.value)}
                                     className="w-full border-gray-300 dark:border-slate-700 dark:bg-slate-800 rounded-lg shadow-sm focus:border-primary focus:ring-primary"
@@ -123,8 +133,8 @@ function PaymentClient() {
                             </div>
                             <div>
                                 <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Telefone / WhatsApp *</label>
-                                <input 
-                                    type="tel" 
+                                <input
+                                    type="tel"
                                     value={phone}
                                     onChange={e => setPhone(e.target.value)}
                                     className="w-full border-gray-300 dark:border-slate-700 dark:bg-slate-800 rounded-lg shadow-sm focus:border-primary focus:ring-primary"
@@ -133,8 +143,8 @@ function PaymentClient() {
                             </div>
                             <div>
                                 <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">E-mail (opcional)</label>
-                                <input 
-                                    type="email" 
+                                <input
+                                    type="email"
                                     value={email}
                                     onChange={e => setEmail(e.target.value)}
                                     className="w-full border-gray-300 dark:border-slate-700 dark:bg-slate-800 rounded-lg shadow-sm focus:border-primary focus:ring-primary"
@@ -173,12 +183,11 @@ function PaymentClient() {
                     </div>
 
                     <div className="p-8 pt-0">
-                        <button 
+                        <button
                             onClick={handleConfirm}
                             disabled={isSubmitting}
-                            className={`w-full text-white text-lg font-bold py-5 rounded-full transition-all flex items-center justify-center gap-2 ${
-                                isSubmitting ? 'bg-primary/70 cursor-not-allowed' : 'bg-primary hover:shadow-lg hover:shadow-primary/40 hover:-translate-y-0.5'
-                            }`}
+                            className={`w-full text-white text-lg font-bold py-5 rounded-full transition-all flex items-center justify-center gap-2 ${isSubmitting ? 'bg-primary/70 cursor-not-allowed' : 'bg-primary hover:shadow-lg hover:shadow-primary/40 hover:-translate-y-0.5'
+                                }`}
                         >
                             <span>{isSubmitting ? 'Confirmando...' : 'Confirmar Agendamento'}</span>
                             <span className="material-symbols-outlined">arrow_forward</span>

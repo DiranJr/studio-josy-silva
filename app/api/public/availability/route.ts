@@ -53,23 +53,29 @@ import { parseISO, startOfDay, endOfDay, addMinutes, isBefore, isAfter, isSameDa
 export async function GET(request: Request) {
     try {
         const { searchParams } = new URL(request.url)
-        const serviceId = searchParams.get('serviceId')
+        const serviceOptionId = searchParams.get('serviceOptionId')
         const dateStr = searchParams.get('date')
         const staffId = searchParams.get('staffId') // optional in MVP if there's only 1 staff
 
-        if (!serviceId || !dateStr) {
-            return NextResponse.json({ error: 'serviceId and date are required' }, { status: 400 })
+        if (!serviceOptionId || !dateStr) {
+            return NextResponse.json({ error: 'serviceOptionId and date are required' }, { status: 400 })
         }
 
         const date = parseISO(dateStr)
         const weekday = date.getDay()
 
-        // 1. Get Service
-        const service = await prisma.service.findUnique({
-            where: { id: serviceId }
+        // 1. Get Service Option
+        const serviceOption = await prisma.serviceOption.findUnique({
+            where: { id: serviceOptionId },
+            include: { service: true }
         })
-        if (!service || !service.active) {
-            return NextResponse.json({ error: 'Service not found or inactive' }, { status: 404 })
+
+        if (!serviceOption || !serviceOption.active || !serviceOption.service.active) {
+            return NextResponse.json({ error: 'SERVICE_OPTION_INACTIVE' }, { status: 404 })
+        }
+
+        if (serviceOption.durationMinutes <= 0) {
+            return NextResponse.json({ error: 'Invalid service duration' }, { status: 400 })
         }
 
         // 2. Get Settings
@@ -134,7 +140,7 @@ export async function GET(request: Request) {
         let currentSlot = dayStart
 
         while (isBefore(currentSlot, dayEnd)) {
-            const slotEnd = addMinutes(currentSlot, service.durationMinutes + settings.bufferMinutes)
+            const slotEnd = addMinutes(currentSlot, serviceOption.durationMinutes + settings.bufferMinutes)
 
             // a) Check if slot ends after working hours
             if (isAfter(slotEnd, dayEnd)) {

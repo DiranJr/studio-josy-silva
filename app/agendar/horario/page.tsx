@@ -8,45 +8,55 @@ import { ptBR } from "date-fns/locale";
 function BookingClient() {
     const router = useRouter();
     const searchParams = useSearchParams();
-    const serviceId = searchParams.get("serviceId");
+    const serviceOptionId = searchParams.get("serviceOptionId");
 
-    const [service, setService] = useState<any>(null);
+    const [serviceOption, setServiceOption] = useState<any>(null);
     const [currentMonth, setCurrentMonth] = useState(new Date());
     const [selectedDate, setSelectedDate] = useState<Date | null>(null);
     const [availableSlots, setAvailableSlots] = useState<string[]>([]);
     const [selectedSlot, setSelectedSlot] = useState<string | null>(null);
     const [loading, setLoading] = useState(true);
 
-    // Fetch service details
+    // Fetch service Option details
     useEffect(() => {
-        if (!serviceId) {
+        if (!serviceOptionId) {
             router.push("/");
             return;
         }
 
-        // Very simple fetch, ideally we'd have a GET /services/:id but we'll fetch all and filter
         fetch("/api/public/services")
             .then((res) => res.json())
             .then((data) => {
-                const found = data.find((s: any) => s.id === serviceId);
-                if (found) {
-                    setService(found);
+                // Find the specific option inside the services
+                let foundOption = null;
+                for (const s of data) {
+                    if (s.options) {
+                        const opt = s.options.find((o: any) => o.id === serviceOptionId);
+                        if (opt) {
+                            foundOption = { ...opt, service: s };
+                            break;
+                        }
+                    }
+                }
+
+                if (foundOption) {
+                    setServiceOption(foundOption);
                 } else {
                     router.push("/");
                 }
                 setLoading(false);
             });
-    }, [serviceId, router]);
+    }, [serviceOptionId, router]);
 
     // Fetch availability when date changes
     useEffect(() => {
-        if (!selectedDate || !serviceId) return;
+        if (!selectedDate || !serviceOptionId) return;
 
         const dateStr = format(selectedDate, "yyyy-MM-dd");
         setAvailableSlots([]);
         setSelectedSlot(null);
 
-        fetch(`/api/public/availability?serviceId=${serviceId}&date=${dateStr}`)
+        fetch(`/api/public/availability?serviceOptionId=${serviceOptionId}&date=${dateStr}`)
             .then((res) => res.json())
             .then((data) => {
                 if (data.availableSlots) {
@@ -54,7 +64,7 @@ function BookingClient() {
                 }
             })
             .catch(console.error);
-    }, [selectedDate, serviceId]);
+    }, [selectedDate, serviceOptionId]);
 
     const daysInMonth = eachDayOfInterval({
         start: startOfMonth(currentMonth),
@@ -69,13 +79,13 @@ function BookingClient() {
 
         const dateStr = format(selectedDate, "yyyy-MM-dd");
         // store in localStorage or URL
-        router.push(`/agendar/pagamento?serviceId=${serviceId}&date=${dateStr}&time=${selectedSlot}`);
+        router.push(`/agendar/pagamento?serviceOptionId=${serviceOptionId}&date=${dateStr}&time=${selectedSlot}`);
     };
 
     const today = startOfDay(new Date());
 
     if (loading) return <div className="min-h-screen flex items-center justify-center">Carregando...</div>;
-    if (!service) return null;
+    if (!serviceOption) return null;
 
     return (
         <div className="bg-background-light dark:bg-background-dark font-display text-slate-900 dark:text-slate-100 min-h-screen flex flex-col">
@@ -136,8 +146,8 @@ function BookingClient() {
                                                 disabled={isPast}
                                                 onClick={() => setSelectedDate(day)}
                                                 className={`h-10 w-10 flex items-center justify-center text-sm font-medium rounded-full transition-colors ${isPast ? 'text-primary/30 cursor-not-allowed' :
-                                                        isSelected ? 'bg-primary text-white shadow-md shadow-primary/30 font-bold' :
-                                                            'hover:bg-primary-soft cursor-pointer text-neutral-dark dark:text-slate-100'
+                                                    isSelected ? 'bg-primary text-white shadow-md shadow-primary/30 font-bold' :
+                                                        'hover:bg-primary-soft cursor-pointer text-neutral-dark dark:text-slate-100'
                                                     }`}
                                             >
                                                 {format(day, "d")}
@@ -163,8 +173,8 @@ function BookingClient() {
                                             key={slot}
                                             onClick={() => setSelectedSlot(slot)}
                                             className={`py-3 px-6 rounded-full font-semibold transition-colors text-center ${selectedSlot === slot
-                                                    ? 'bg-primary text-white shadow-md shadow-primary/30 font-bold'
-                                                    : 'border border-primary-light text-primary hover:bg-primary-soft'
+                                                ? 'bg-primary text-white shadow-md shadow-primary/30 font-bold'
+                                                : 'border border-primary-light text-primary hover:bg-primary-soft'
                                                 }`}
                                         >
                                             {slot}
@@ -176,13 +186,15 @@ function BookingClient() {
                             <div className="mt-auto pt-8">
                                 <div className="bg-primary-soft/50 dark:bg-primary/5 p-4 rounded-xl border border-primary/10">
                                     <p className="text-sm text-primary/60 dark:text-primary-light/60 uppercase font-bold tracking-widest mb-1">Resumo do Agendamento</p>
-                                    <p className="text-neutral-dark dark:text-slate-100 font-bold text-lg">{service.name}</p>
+                                    <p className="text-neutral-dark dark:text-slate-100 font-bold text-lg">
+                                        {serviceOption.service.name} <span className="text-sm font-normal text-primary">({serviceOption.type === 'APPLICATION' ? 'Aplicação' : 'Manutenção'})</span>
+                                    </p>
                                     <div className="flex justify-between items-center mt-1">
                                         <span className="text-neutral-dark/70 dark:text-slate-400 font-medium">
                                             Data e Hora: {selectedDate && selectedSlot ? `${format(selectedDate, "dd MMM", { locale: ptBR })} às ${selectedSlot}` : '-'}
                                         </span>
                                         <span className="text-primary font-extrabold text-xl">
-                                            R$ {(service.priceCents / 100).toFixed(2)}
+                                            R$ {(serviceOption.priceCents / 100).toFixed(2)}
                                         </span>
                                     </div>
                                 </div>
@@ -194,15 +206,15 @@ function BookingClient() {
                         <div className="flex items-center gap-2 text-neutral-dark dark:text-slate-300">
                             <span className="material-symbols-outlined text-primary">info</span>
                             <span className="font-medium text-sm">
-                                Sinal de R$ {(service.depositCents / 100).toFixed(2)} necessário para confirmação.
+                                Sinal de R$ {(serviceOption.depositCents / 100).toFixed(2)} necessário para confirmação.
                             </span>
                         </div>
                         <button
                             onClick={handleConfirm}
                             disabled={!selectedDate || !selectedSlot}
                             className={`w-full md:w-auto font-bold py-4 px-10 rounded-full transition-all flex items-center justify-center gap-2 ${!selectedDate || !selectedSlot
-                                    ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
-                                    : 'bg-primary hover:bg-primary/90 text-white transform hover:scale-[1.02] shadow-lg shadow-primary/20'
+                                ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                                : 'bg-primary hover:bg-primary/90 text-white transform hover:scale-[1.02] shadow-lg shadow-primary/20'
                                 }`}
                         >
                             Confirmar Dia e Horário

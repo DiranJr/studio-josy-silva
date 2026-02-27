@@ -35,7 +35,7 @@ A full-stack Lash Salon scheduling and CRM application built with Next.js, Prism
 1. Clone the repository
 2. Install dependencies:
    ```bash
-   npm install
+   npm installat
    ```
 3. Copy environment file:
    ```bash
@@ -54,13 +54,13 @@ A full-stack Lash Salon scheduling and CRM application built with Next.js, Prism
 npm run dev
 ```
 
-Open `http://localhost:3000` to see the public site.
-Open `http://localhost:3000/login` to access the CRM.
+Open `http://localhost:3005` to see the public site.
+Open `http://localhost:3005/login` to access the CRM.
 
 ### Documentation
 
 - The API is automatically documented with Swagger.
-- Visit `http://localhost:3000/docs` to interact with the Swagger UI after starting the dev server.
+- Visit `http://localhost:3005/docs` to interact with the Swagger UI after starting the dev server.
 
 ### Testing
 

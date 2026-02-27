@@ -1,6 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import prisma from "@/lib/prisma";
+import ServiceGrid from "./components/ServiceGrid";
 
 const SERVICE_IMAGES: Record<string, string> = {
     "Volume Brasileiro": "https://lh3.googleusercontent.com/aida-public/AB6AXuDF02QowsJkgA5HnZWbYYtPN_jPBrzyaJu2zDkZHeYHGZqR_EKQcrS4ZQjkLXjZgnTmgoXXGxmPPVtALRzr7iYDB-y0rmR5JxWd_wJ-gOM0a0OLKqAJG5kaZCDNOogUjWaAHlaiEe-EqYpqUjDYpk1AXy9U23K1TXJ-jzv-z2sUNd2PjbF928oipq-eF0BJ7XsONWuk5r5BGbi-SeP9bhsFImibzwkk_Xqf4EWel3k-RglMvBMF7ITqG1IPP_21dBi_F0E8aSLvD5FO",
@@ -14,6 +15,11 @@ const DEFAULT_IMAGE = "https://lh3.googleusercontent.com/aida-public/AB6AXuDF02Q
 export default async function Home() {
     const services = await prisma.service.findMany({
         where: { active: true },
+        include: {
+            options: {
+                where: { active: true }
+            }
+        },
         orderBy: { createdAt: "asc" }
     });
 
@@ -41,104 +47,7 @@ export default async function Home() {
                 </div>
             </section>
 
-            {/* Main Services Section */}
-            <section className="py-24 px-6 max-w-7xl mx-auto" id="servicos">
-                <div className="text-center mb-16">
-                    <span className="text-primary font-bold tracking-widest uppercase text-sm">
-                        Beleza &amp; Sofisticação
-                    </span>
-                    <h3 className="text-4xl font-extrabold mt-2">Nossos Serviços Premium</h3>
-                </div>
-
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-                    {services.map((service) => (
-                        <div key={service.id} className="bg-white rounded-lg shadow-xl shadow-primary/5 overflow-hidden flex flex-col hover:-translate-y-1 transition-transform border border-primary/5">
-                            <div className="h-56 bg-primary/10 overflow-hidden">
-                                <img
-                                    alt={service.name}
-                                    className="w-full h-full object-cover"
-                                    src={SERVICE_IMAGES[service.name] || DEFAULT_IMAGE}
-                                />
-                            </div>
-                            <div className="p-6 flex flex-col flex-grow">
-                                <h4 className="text-xl font-bold mb-2">{service.name}</h4>
-                                <p className="text-sm text-deep-text/60 mb-6 flex-grow">
-                                    {service.description || "Serviço especializado de extensão de cílios."}
-                                </p>
-                                <div className="flex gap-2 mb-4">
-                                    <span className="bg-accent-pink text-primary text-[10px] font-black px-2 py-1 rounded-full uppercase tracking-tighter">
-                                        {service.durationMinutes} min
-                                    </span>
-                                    <span className="bg-accent-pink text-primary text-[10px] font-black px-2 py-1 rounded-full uppercase tracking-tighter">
-                                        R$ {(service.priceCents / 100).toFixed(2)}
-                                    </span>
-                                </div>
-                                <Link
-                                    href={`/agendar/horario?serviceId=${service.id}`}
-                                    className="w-full bg-primary text-white py-3 rounded-lg font-bold hover:bg-primary/90 transition-colors text-center inline-block"
-                                >
-                                    Agendar
-                                </Link>
-                            </div>
-                        </div>
-                    ))}
-                </div>
-            </section>
-
-            {/* Complementary Services Section */}
-            <section className="bg-white py-24 px-6 border-y border-primary/5">
-                <div className="max-w-7xl mx-auto">
-                    <div className="flex flex-col md:flex-row md:items-end justify-between mb-12 gap-4">
-                        <div>
-                            <span className="text-primary font-bold tracking-widest uppercase text-sm">
-                                Outros Serviços
-                            </span>
-                            <h3 className="text-4xl font-extrabold mt-2">Design &amp; Cuidados</h3>
-                        </div>
-                        <p className="text-deep-text/60 max-w-sm">
-                            Complemente seu olhar com nossos serviços especializados de sobrancelhas e epilação.
-                        </p>
-                    </div>
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                        <div className="p-6 rounded-lg bg-soft-pink flex justify-between items-center group hover:bg-accent-pink transition-colors">
-                            <div>
-                                <h5 className="font-bold text-lg">Design Simples</h5>
-                                <span className="text-primary font-black text-xl">R$ 25</span>
-                            </div>
-                            <span className="material-symbols-outlined text-primary size-10 flex items-center justify-center bg-white rounded-full group-hover:scale-110 transition-transform">
-                                brush
-                            </span>
-                        </div>
-                        <div className="p-6 rounded-lg bg-soft-pink flex justify-between items-center group hover:bg-accent-pink transition-colors">
-                            <div>
-                                <h5 className="font-bold text-lg">Design com Henna</h5>
-                                <span className="text-primary font-black text-xl">R$ 45</span>
-                            </div>
-                            <span className="material-symbols-outlined text-primary size-10 flex items-center justify-center bg-white rounded-full group-hover:scale-110 transition-transform">
-                                ink_pen
-                            </span>
-                        </div>
-                        <div className="p-6 rounded-lg bg-soft-pink flex justify-between items-center group hover:bg-accent-pink transition-colors">
-                            <div>
-                                <h5 className="font-bold text-lg">Epilação de Buço</h5>
-                                <span className="text-primary font-black text-xl">R$ 10</span>
-                            </div>
-                            <span className="material-symbols-outlined text-primary size-10 flex items-center justify-center bg-white rounded-full group-hover:scale-110 transition-transform">
-                                face
-                            </span>
-                        </div>
-                        <div className="p-6 rounded-lg bg-soft-pink flex justify-between items-center group hover:bg-accent-pink transition-colors">
-                            <div>
-                                <h5 className="font-bold text-lg">Brow Lamination</h5>
-                                <span className="text-primary font-black text-xl">R$ 110</span>
-                            </div>
-                            <span className="material-symbols-outlined text-primary size-10 flex items-center justify-center bg-white rounded-full group-hover:scale-110 transition-transform">
-                                auto_awesome
-                            </span>
-                        </div>
-                    </div>
-                </div>
-            </section>
+            <ServiceGrid services={services} />
 
             {/* Information & Rules Section */}
             <section className="py-24 px-6 bg-background-light" id="regras">
@@ -164,7 +73,7 @@ export default async function Home() {
                                     payments
                                 </span>
                                 <p className="font-semibold text-deep-text">
-                                    Sinal de R$ 40,00 para agendamento.
+                                    Taxa de R$ 40,00 para agendamento.
                                 </p>
                             </div>
                             <div className="flex items-center gap-4 bg-white/50 p-4 rounded-lg">

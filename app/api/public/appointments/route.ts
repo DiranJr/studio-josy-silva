@@ -4,7 +4,7 @@ import { z } from 'zod'
 import { parseISO, startOfDay, endOfDay, addMinutes, isBefore, isAfter } from 'date-fns'
 
 const CreateAppointmentSchema = z.object({
-    serviceId: z.string().uuid(),
+    serviceOptionId: z.string().uuid(),
     staffId: z.string().uuid().optional(),
     date: z.string(), // YYYY-MM-DD
     time: z.string(), // HH:mm
@@ -28,9 +28,12 @@ export async function POST(request: Request) {
         const data = parsed.data
 
         // 1. Fetch relations & Settings
-        const service = await prisma.service.findUnique({ where: { id: data.serviceId } })
-        if (!service || !service.active) {
-            return NextResponse.json({ error: 'Service not found or inactive' }, { status: 404 })
+        const serviceOption = await prisma.serviceOption.findUnique({
+            where: { id: data.serviceOptionId },
+            include: { service: true }
+        })
+        if (!serviceOption || !serviceOption.active || !serviceOption.service.active) {
+            return NextResponse.json({ error: 'SERVICE_OPTION_INACTIVE' }, { status: 404 })
         }
 
         const settings = await prisma.settings.findFirst()
@@ -49,7 +52,7 @@ export async function POST(request: Request) {
         const startAt = new Date(dateObj)
         startAt.setHours(hours, mins, 0, 0)
 
-        const endAt = addMinutes(startAt, service.durationMinutes + settings.bufferMinutes)
+        const endAt = addMinutes(startAt, serviceOption.durationMinutes + settings.bufferMinutes)
 
         const appointments = await prisma.appointment.findMany({
             where: {
@@ -90,27 +93,37 @@ export async function POST(request: Request) {
         }
 
         // 4. Create appointment
-        const requiresDeposit = service.depositCents > 0;
+        const requiresDeposit = serviceOption.depositCents > 0;
         const initialStatus = requiresDeposit ? 'PENDING_PAYMENT' : 'CONFIRMED'
 
         const appointment = await prisma.appointment.create({
             data: {
                 clientId,
-                serviceId: service.id,
+                serviceOptionId: serviceOption.id,
                 staffId,
                 startAt,
                 endAt,
                 clientNotes: data.clientNotes,
                 status: initialStatus
+            },
+            include: {
+                serviceOption: {
+                    include: { service: true }
+                }
             }
         })
 
         return NextResponse.json({
             success: true,
-            appointment,
+            appointmentId: appointment.id,
+            status: appointment.status,
+            startAt: appointment.startAt,
+            endAt: appointment.endAt,
+            serviceName: appointment.serviceOption.service.name,
+            optionType: appointment.serviceOption.type,
             requiresDeposit,
-            depositValue: service.depositCents,
-            totalValue: service.priceCents
+            depositValue: serviceOption.depositCents,
+            totalValue: serviceOption.priceCents
         })
 
     } catch (error) {
