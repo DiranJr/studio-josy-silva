@@ -44,6 +44,10 @@ export default function CRMLayout({ children }: { children: React.ReactNode }) {
                         <span className="material-symbols-outlined">payments</span>
                         <span className="text-sm font-medium">Financeiro</span>
                     </Link>
+                    <Link href="/crm/configuracoes" className={`flex items-center gap-3 px-4 py-3 text-white transition-all ${isActive("/crm/configuracoes")}`}>
+                        <span className="material-symbols-outlined">settings</span>
+                        <span className="text-sm font-medium">Configurações</span>
+                    </Link>
                 </nav>
                 <div className="p-4 mt-auto">
                     <div className="bg-white/10 rounded-xl p-4">

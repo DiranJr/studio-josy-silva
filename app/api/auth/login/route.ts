@@ -5,7 +5,7 @@ import { signAccessToken, signRefreshToken } from '@/lib/jwt'
 import { z } from 'zod'
 
 const LoginSchema = z.object({
-    email: z.string().email(),
+    email: z.string().min(3), // Accept admin@local (no TLD requirement)
     password: z.string().min(6),
 })
 

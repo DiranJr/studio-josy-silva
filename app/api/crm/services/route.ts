@@ -10,7 +10,10 @@ export async function GET(request: Request) {
         if (!payload || payload.role !== 'ADMIN') return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
 
         const services = await prisma.service.findMany({
-            orderBy: { createdAt: 'desc' }
+            include: {
+                options: { orderBy: { type: 'asc' } }
+            },
+            orderBy: { createdAt: 'asc' }
         })
 
         return NextResponse.json(services)
@@ -22,10 +25,14 @@ export async function GET(request: Request) {
 const CreateServiceSchema = z.object({
     name: z.string().min(2),
     description: z.string().optional(),
-    durationMinutes: z.number().int().positive(),
-    priceCents: z.number().int().nonnegative(),
-    depositCents: z.number().int().nonnegative().default(0),
-    active: z.boolean().default(true)
+    category: z.string().default('Cilios'),
+    applicationDurationMinutes: z.number().int().positive(),
+    applicationPriceCents: z.number().int().nonnegative(),
+    applicationDepositCents: z.number().int().nonnegative().default(0),
+    maintenanceDurationMinutes: z.number().int().positive().optional(),
+    maintenancePriceCents: z.number().int().nonnegative().optional(),
+    maintenanceDepositCents: z.number().int().nonnegative().default(0),
+    includesMaintenance: z.boolean().default(true),
 })
 
 export async function POST(request: Request) {
@@ -36,14 +43,37 @@ export async function POST(request: Request) {
 
         const body = await request.json()
         const parsed = CreateServiceSchema.safeParse(body)
+        if (!parsed.success) return NextResponse.json({ error: 'Invalid input', details: parsed.error.flatten() }, { status: 400 })
 
-        if (!parsed.success) return NextResponse.json({ error: 'Invalid input' }, { status: 400 })
+        const { name, description, category,
+            applicationDurationMinutes, applicationPriceCents, applicationDepositCents,
+            maintenanceDurationMinutes, maintenancePriceCents, maintenanceDepositCents,
+            includesMaintenance } = parsed.data
+
+        const options: any[] = [
+            { type: 'APPLICATION', durationMinutes: applicationDurationMinutes, priceCents: applicationPriceCents, depositCents: applicationDepositCents, active: true }
+        ]
+
+        if (includesMaintenance) {
+            options.push({
+                type: 'MAINTENANCE',
+                durationMinutes: maintenanceDurationMinutes || applicationDurationMinutes,
+                priceCents: maintenancePriceCents || applicationPriceCents,
+                depositCents: maintenanceDepositCents,
+                active: true
+            })
+        } else {
+            options.push({
+                type: 'MAINTENANCE', durationMinutes: 30, priceCents: 0, depositCents: 0, active: false
+            })
+        }
 
         const newService = await prisma.service.create({
-            data: parsed.data
+            data: { name, description, category, options: { create: options } },
+            include: { options: true }
         })
 
-        return NextResponse.json(newService)
+        return NextResponse.json(newService, { status: 201 })
     } catch (error) {
         return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 })
     }

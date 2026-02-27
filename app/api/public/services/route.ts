@@ -4,12 +4,14 @@ import prisma from '@/lib/prisma'
 export async function GET() {
     try {
         const services = await prisma.service.findMany({
-            where: {
-                active: true,
+            where: { active: true },
+            include: {
+                options: {
+                    where: { active: true },
+                    orderBy: { type: 'asc' }, // APPLICATION before MAINTENANCE alphabetically
+                }
             },
-            orderBy: {
-                name: 'asc',
-            }
+            orderBy: { createdAt: 'asc' },
         })
 
         return NextResponse.json(services)

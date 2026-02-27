@@ -28,8 +28,9 @@ export default function LoginPage() {
                 throw new Error(data.error || "Erro ao fazer login");
             }
 
-            // For MVP, store token in a cookie so Server Components & Middleware can read it
+            // Store token in cookie (for middleware) and localStorage (for API calls)
             document.cookie = `auth-token=${data.accessToken}; path=/; max-age=86400; SameSite=Strict`;
+            localStorage.setItem("crm_token", data.accessToken);
 
             router.push("/crm");
             router.refresh();

@@ -26,26 +26,90 @@ export default async function Home() {
     return (
         <main>
             {/* Hero Section */}
-            <section className="bg-soft-pink py-20 px-6">
-                <div className="max-w-4xl mx-auto text-center flex flex-col items-center">
-                    <div className="size-40 rounded-full border-4 border-white shadow-xl mb-8 overflow-hidden bg-white">
-                        <img
-                            alt="Josy Silva Profile"
-                            className="w-full h-full object-cover"
-                            src="https://lh3.googleusercontent.com/aida-public/AB6AXuCnSLptdcmnrXyh3Ae9kyUVfsATmUb4lEZPnIEQPVhtrGPottMbl6cofMJ0Ici80P_5D0Va119wGHSCQwixd_HaVWyB2kRGcCALXX8XzCWc9RVQpL7e_5FatbkxmCjAnMB4fFofaPLXoPrIWLtnHqpK4LdJ9Ve-O9JlTBJqxFYOik04tK8g1dYtBT4U0BOxSe1XDEGlW81vLXHeLSIej8akiXKzRfzt3QhzjP6IJPXqCUnPufNBBMuJnp3zVVrb5i6kFHQ-ZRTbf_Mj"
-                        />
+            <section className="relative overflow-hidden bg-soft-pink py-16 px-6 lg:py-0 min-h-[90vh] flex items-center">
+                {/* Background decoration */}
+                <div className="absolute inset-0 pointer-events-none">
+                    <div className="absolute -top-32 -right-32 w-96 h-96 rounded-full bg-primary/10 blur-3xl" />
+                    <div className="absolute -bottom-20 -left-20 w-72 h-72 rounded-full bg-accent-pink/40 blur-2xl" />
+                </div>
+
+                <div className="max-w-7xl mx-auto w-full grid grid-cols-1 lg:grid-cols-2 gap-12 items-center relative z-10">
+                    {/* Left — Text */}
+                    <div className="flex flex-col items-start text-left order-2 lg:order-1 pb-8 lg:pb-0 lg:py-20">
+                        <span className="inline-flex items-center gap-2 bg-primary/10 text-primary font-bold text-xs uppercase tracking-widest px-4 py-2 rounded-full mb-6">
+                            <span className="material-symbols-outlined text-[16px]">auto_awesome</span>
+                            Lash Designer Especialista
+                        </span>
+
+                        <h1 className="text-5xl md:text-6xl xl:text-7xl font-extrabold text-deep-text leading-[1.05] mb-6">
+                            Studio<br />
+                            <span className="text-primary">Josy Silva</span>
+                        </h1>
+
+                        <p className="text-lg text-deep-text/70 max-w-lg mb-10 leading-relaxed font-medium">
+                            Especialista em extensões de cílios e design de sobrancelhas de luxo. Realce sua beleza natural com sofisticação e o cuidado que você merece.
+                        </p>
+
+                        <div className="flex flex-col sm:flex-row gap-4">
+                            <a href="#servicos" className="inline-flex items-center justify-center gap-2 bg-primary text-white px-8 py-4 rounded-xl text-lg font-bold shadow-xl shadow-primary/30 hover:bg-primary/90 hover:-translate-y-0.5 transition-all">
+                                <span className="material-symbols-outlined">calendar_month</span>
+                                Marcar meu horário
+                            </a>
+                            <a href="#servicos" className="inline-flex items-center justify-center gap-2 bg-white text-primary px-8 py-4 rounded-xl text-lg font-bold border-2 border-primary/10 hover:border-primary/30 transition-all">
+                                Ver serviços
+                            </a>
+                        </div>
+
+                        {/* Trust badges */}
+                        <div className="flex flex-wrap gap-6 mt-12 pt-8 border-t border-primary/10 w-full">
+                            {[
+                                { icon: "verified", text: "Volume Brasileiro" },
+                                { icon: "star", text: "Volume Luxo" },
+                                { icon: "spa", text: "Brow Lamination" },
+                            ].map(b => (
+                                <div key={b.icon} className="flex items-center gap-2 text-sm text-deep-text/60 font-medium">
+                                    <span className="material-symbols-outlined text-primary text-[18px]">{b.icon}</span>
+                                    {b.text}
+                                </div>
+                            ))}
+                        </div>
                     </div>
-                    <h2 className="text-5xl md:text-6xl font-extrabold text-deep-text mb-6">
-                        Studio Josy Silva
-                    </h2>
-                    <p className="text-lg md:text-xl text-deep-text/70 max-w-2xl mb-10 leading-relaxed font-medium">
-                        Especialista em extensões de cílios e design de sobrancelhas de luxo. Realce sua beleza natural com sofisticação e o cuidado que você merece.
-                    </p>
-                    <a href="#servicos" className="bg-primary text-white px-10 py-4 rounded-xl text-lg font-bold shadow-xl shadow-primary/30 hover:bg-primary/90 transition-all">
-                        Marcar meu horário
-                    </a>
+
+                    {/* Right — Photo */}
+                    <div className="relative flex justify-center lg:justify-end order-1 lg:order-2">
+                        {/* Pink gradient backdrop */}
+                        <div className="absolute bottom-0 right-0 lg:right-0 w-[85%] h-[90%] bg-gradient-to-t from-primary/20 to-transparent rounded-3xl" />
+
+                        {/* Photo */}
+                        <div className="relative z-10 w-72 md:w-96 lg:w-[420px]">
+                            <img
+                                src="/josy-silva.jpg"
+                                alt="Josy Silva — Especialista em Extensão de Cílios"
+                                className="w-full object-cover object-top rounded-3xl shadow-2xl shadow-primary/20"
+                                style={{ maxHeight: "600px", objectPosition: "top center" }}
+                            />
+
+                            {/* Floating badge */}
+                            <div className="absolute -left-6 bottom-10 bg-white rounded-2xl shadow-xl shadow-primary/10 px-4 py-3 flex items-center gap-3 border border-primary/5">
+                                <div className="bg-green-100 rounded-full p-2">
+                                    <span className="material-symbols-outlined text-green-600 text-[18px]">check_circle</span>
+                                </div>
+                                <div>
+                                    <p className="font-extrabold text-deep-text text-sm">+500 clientes</p>
+                                    <p className="text-deep-text/50 text-xs">atendidas com sucesso</p>
+                                </div>
+                            </div>
+
+                            {/* Top badge */}
+                            <div className="absolute -right-4 top-8 bg-primary text-white rounded-2xl shadow-xl px-4 py-3 text-center">
+                                <p className="font-extrabold text-sm">⭐ 5.0</p>
+                                <p className="text-white/80 text-xs">Avaliação</p>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </section>
+
 
             <ServiceGrid services={services} />
 
