@@ -1,10 +1,13 @@
 import prisma from "@/lib/prisma";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
+import CalendarSidebar from "./CalendarSidebar";
+import AppointmentActions from "./AppointmentActions";
 
 export default async function CRMAppointments({ searchParams }: { searchParams: { date?: string } }) {
     // Basic date parsing from URL or use today
-    const queryDate = searchParams.date ? new Date(searchParams.date) : new Date();
+    const queryDateStr = searchParams.date || new Date().toISOString();
+    const queryDate = new Date(queryDateStr);
 
     // Normalize to start and end of day for the query
     const startOfDay = new Date(queryDate.getFullYear(), queryDate.getMonth(), queryDate.getDate());
@@ -44,12 +47,11 @@ export default async function CRMAppointments({ searchParams }: { searchParams: 
 
             <div className="flex gap-8 flex-1 overflow-hidden">
                 {/* Agenda List */}
-                <div className="flex-1 bg-white dark:bg-slate-900 rounded-xl border border-slate-100 dark:border-slate-800 flex flex-col overflow-hidden">
-                    <div className="p-4 border-b border-slate-100 dark:border-slate-800 flex justify-between items-center bg-slate-50 dark:bg-slate-800/50">
+                <div className="flex-1 bg-white dark:bg-slate-900 rounded-xl border border-slate-100 dark:border-slate-800 flex flex-col overflow-hidden min-h-0">
+                    <div className="p-4 border-b border-slate-100 dark:border-slate-800 flex justify-between items-center bg-slate-50 dark:bg-slate-800/50 shrink-0">
                         <h3 className="font-bold text-slate-800 dark:text-slate-200">
                             Agenda para {format(startOfDay, "dd 'de' MMMM, yyyy", { locale: ptBR })}
                         </h3>
-                        {/* Day navigation could go here */}
                     </div>
 
                     <div className="flex-1 overflow-y-auto p-4 space-y-4">
@@ -65,7 +67,7 @@ export default async function CRMAppointments({ searchParams }: { searchParams: 
                                         <p className="text-xl font-bold font-display text-slate-800 dark:text-slate-200">{format(new Date(app.startAt), "HH:mm")}</p>
                                         <p className="text-xs text-slate-400">{app.service.durationMinutes} min</p>
                                     </div>
-                                    <div className="flex-1">
+                                    <div className="flex-1 flex flex-col">
                                         <div className="flex justify-between items-start">
                                             <h4 className="font-bold text-slate-900 dark:text-slate-100 text-lg">{app.client.name}</h4>
                                             {app.status === 'CONFIRMED' ? (
@@ -76,6 +78,10 @@ export default async function CRMAppointments({ searchParams }: { searchParams: 
                                                 <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-700 dark:bg-yellow-900/40 dark:text-yellow-400">
                                                     <span className="material-symbols-outlined text-[14px]">schedule</span>Pendente Sinal
                                                 </span>
+                                            ) : app.status === 'CANCELLED' ? (
+                                                <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-700 dark:bg-red-900/40 dark:text-red-400">
+                                                    <span className="material-symbols-outlined text-[14px]">cancel</span>Cancelado
+                                                </span>
                                             ) : (
                                                 <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-400">
                                                     {app.status}
@@ -83,13 +89,9 @@ export default async function CRMAppointments({ searchParams }: { searchParams: 
                                             )}
                                         </div>
                                         <p className="text-slate-500 dark:text-slate-400 text-sm mt-1">{app.service.name}</p>
-                                        <div className="mt-4 flex gap-2">
-                                            <button className="text-xs font-semibold text-primary/80 hover:text-primary transition-colors flex items-center gap-1">
-                                                <span className="material-symbols-outlined text-sm">visibility</span> Detalhes
-                                            </button>
-                                            <button className="text-xs font-semibold text-slate-500 hover:text-slate-700 dark:hover:text-slate-300 transition-colors flex items-center gap-1">
-                                                <span className="material-symbols-outlined text-sm">edit</span> Editar
-                                            </button>
+
+                                        <div className="mt-auto pt-4">
+                                            <AppointmentActions appointmentId={app.id} currentStatus={app.status} />
                                         </div>
                                     </div>
                                 </div>
@@ -99,15 +101,7 @@ export default async function CRMAppointments({ searchParams }: { searchParams: 
                 </div>
 
                 {/* Calendar Side Panel */}
-                <div className="w-[320px] bg-white dark:bg-slate-900 p-6 rounded-xl border border-slate-100 dark:border-slate-800 shadow-sm shrink-0 flex flex-col hidden lg:flex">
-                    <h3 className="text-lg font-bold text-slate-900 dark:text-slate-100 mb-6">Mini Calendário</h3>
-                    <div className="flex-1 flex items-center justify-center text-slate-400 border-2 border-dashed border-slate-200 dark:border-slate-800 rounded-xl p-4 text-center">
-                        <div>
-                            <span className="material-symbols-outlined text-4xl mb-2 opacity-50">calendar_month</span>
-                            <p className="text-sm">Integração do componente de calendário real aqui.</p>
-                        </div>
-                    </div>
-                </div>
+                <CalendarSidebar initialDate={startOfDay.toISOString()} />
             </div>
         </div>
     );

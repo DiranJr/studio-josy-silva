@@ -2,6 +2,54 @@ import { NextResponse } from 'next/server'
 import prisma from '@/lib/prisma'
 import { parseISO, startOfDay, endOfDay, addMinutes, isBefore, isAfter, isSameDay } from 'date-fns'
 
+/**
+ * @swagger
+ * /api/public/availability:
+ *   get:
+ *     summary: Get available appointment slots
+ *     description: Returns a list of available HH:mm slots for a given service and date, considering staff working hours, existing appointments, and blocks.
+ *     tags:
+ *       - Public
+ *     parameters:
+ *       - in: query
+ *         name: serviceId
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: The UUID of the service
+ *       - in: query
+ *         name: date
+ *         required: true
+ *         schema:
+ *           type: string
+ *           format: date
+ *         description: The target date (YYYY-MM-DD)
+ *       - in: query
+ *         name: staffId
+ *         required: false
+ *         schema:
+ *           type: string
+ *         description: The UUID of the staff member (optional, defaults to first active staff)
+ *     responses:
+ *       200:
+ *         description: Successful response
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 availableSlots:
+ *                   type: array
+ *                   items:
+ *                     type: string
+ *                   example: ["09:00", "09:30", "10:00"]
+ *       400:
+ *         description: Missing parameters
+ *       404:
+ *         description: Service not found
+ *       500:
+ *         description: Server configuration error
+ */
 export async function GET(request: Request) {
     try {
         const { searchParams } = new URL(request.url)

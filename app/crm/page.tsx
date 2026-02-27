@@ -9,15 +9,26 @@ export default async function CRMDashboard() {
     const tomorrow = new Date(today);
     tomorrow.setDate(tomorrow.getDate() + 1);
 
-    const appointmentsToday = await prisma.appointment.count({
+    const appointmentsToday = await prisma.appointment.findMany({
         where: {
             startAt: {
                 gte: today,
                 lt: tomorrow,
             },
-            status: { in: ['CONFIRMED', 'DONE'] }
+            status: { in: ['PENDING_PAYMENT', 'CONFIRMED', 'DONE'] }
         },
+        include: {
+            service: true
+        }
     });
+
+    const appointmentsTodayCount = appointmentsToday.length;
+
+    const estimatedRevenueCents = appointmentsToday.reduce((total, app) => total + app.service.priceCents, 0);
+    const estimatedRevenue = new Intl.NumberFormat('pt-BR', {
+        style: 'currency',
+        currency: 'BRL'
+    }).format(estimatedRevenueCents / 100);
 
     const totalClients = await prisma.client.count();
 
@@ -42,7 +53,7 @@ export default async function CRMDashboard() {
                         </div>
                     </div>
                     <p className="text-slate-500 dark:text-slate-400 text-sm font-medium">Agendamentos Hoje</p>
-                    <p className="text-3xl font-bold text-slate-900 dark:text-slate-100 mt-1">{appointmentsToday}</p>
+                    <p className="text-3xl font-bold text-slate-900 dark:text-slate-100 mt-1">{appointmentsTodayCount}</p>
                 </div>
                 <div className="bg-white dark:bg-slate-900 p-6 rounded-xl border border-slate-100 dark:border-slate-800 shadow-sm">
                     <div className="flex justify-between items-start mb-4">
@@ -51,7 +62,7 @@ export default async function CRMDashboard() {
                         </div>
                     </div>
                     <p className="text-slate-500 dark:text-slate-400 text-sm font-medium">Faturamento Est.</p>
-                    <p className="text-3xl font-bold text-slate-900 dark:text-slate-100 mt-1">N/A</p>
+                    <p className="text-3xl font-bold text-slate-900 dark:text-slate-100 mt-1">{estimatedRevenue}</p>
                 </div>
                 <div className="bg-white dark:bg-slate-900 p-6 rounded-xl border border-slate-100 dark:border-slate-800 shadow-sm">
                     <div className="flex justify-between items-start mb-4">
