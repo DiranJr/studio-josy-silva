@@ -1,6 +1,6 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-    output: 'standalone'
+    // output: 'standalone' // Removed for Vercel deployment
 }
 
 module.exports = nextConfig
