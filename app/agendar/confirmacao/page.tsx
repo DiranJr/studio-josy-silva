@@ -14,7 +14,7 @@ export default async function ConfirmationPage({ searchParams }: { searchParams:
     const appointment = await prisma.appointment.findUnique({
         where: { id: appointmentId },
         include: {
-            service: true,
+            serviceOption: { include: { service: true } },
             staff: true,
             client: true,
         },
@@ -67,8 +67,10 @@ export default async function ConfirmationPage({ searchParams }: { searchParams:
                                     <span className="material-symbols-outlined text-primary/60 mt-1">content_cut</span>
                                     <div>
                                         <p className="text-sm font-semibold text-primary/70 uppercase tracking-wider mb-1">Serviço</p>
-                                        <p className="text-lg font-bold text-slate-800 dark:text-slate-200">{appointment.service.name}</p>
-                                        <p className="text-primary font-bold">R$ {(appointment.service.priceCents / 100).toFixed(2)}</p>
+                                        <p className="text-lg font-bold text-slate-800 dark:text-slate-200">
+                                            {appointment.serviceOption.service.name} <span className="font-normal text-sm">({appointment.serviceOption.type === 'APPLICATION' ? 'Aplicação' : 'Manutenção'})</span>
+                                        </p>
+                                        <p className="text-primary font-bold">R$ {(appointment.serviceOption.priceCents / 100).toFixed(2)}</p>
                                     </div>
                                 </div>
                                 <div className="flex items-start gap-4">
@@ -106,7 +108,7 @@ export default async function ConfirmationPage({ searchParams }: { searchParams:
                                 <span className="material-symbols-outlined text-primary">info</span>
                                 <div className="space-y-2">
                                     <p className="text-slate-800 dark:text-slate-200 font-bold leading-normal">
-                                        Lembre-se: O Sinal de R$ {(appointment.service.depositCents / 100).toFixed(2)} foi solicitado via Pix.
+                                        Lembre-se: A Taxa de Reserva de R$ {(appointment.serviceOption.depositCents / 100).toFixed(2)} foi solicitada via Pix.
                                     </p>
                                     <p className="text-slate-600 dark:text-slate-400 text-sm italic">
                                         Proibido acompanhantes/crianças no local.

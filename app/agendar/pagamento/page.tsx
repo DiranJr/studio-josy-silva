@@ -110,7 +110,7 @@ function PaymentClient() {
                         <h2 className="text-slate-900 dark:text-slate-50 text-3xl font-extrabold tracking-tight mb-4">Finalizar Agendamento</h2>
                         <div className="bg-primary/5 inline-block px-6 py-3 rounded-full border border-primary/10 mb-4">
                             <p className="text-primary text-sm md:text-base font-semibold">
-                                {serviceOption.service.name} <span className="font-normal">({serviceOption.type === 'APPLICATION' ? 'Aplicação' : 'Manutenção'})</span> — <span className="font-bold">Sinal: R$ {(serviceOption.depositCents / 100).toFixed(2)}</span>
+                                {serviceOption.service.name} <span className="font-normal">({serviceOption.type === 'APPLICATION' ? 'Aplicação' : 'Manutenção'})</span> — <span className="font-bold">Taxa de Reserva: R$ {(serviceOption.depositCents / 100).toFixed(2)}</span>
                             </p>
                         </div>
                         <p className="text-sm text-neutral-dark/70 dark:text-slate-400">
@@ -154,7 +154,7 @@ function PaymentClient() {
                         </div>
 
                         <div className="border-t border-primary/10 pt-6">
-                            <h3 className="text-lg font-bold mb-4">Pagamento do Sinal via Pix</h3>
+                            <h3 className="text-lg font-bold mb-4">Pagamento da Taxa de Reserva via Pix</h3>
                             <div className="flex flex-col items-center">
                                 <div className="p-4 bg-white border-2 border-primary/20 rounded-2xl shadow-sm mb-6">
                                     <div className="w-48 h-48 bg-slate-100 flex items-center justify-center relative overflow-hidden rounded-lg">

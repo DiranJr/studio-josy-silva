@@ -24,7 +24,7 @@ export default async function CRMClients({ searchParams }: { searchParams: { q?:
                 appointments: {
                     orderBy: { startAt: 'desc' },
                     take: 1,
-                    include: { service: true }
+                    include: { serviceOption: { include: { service: true } } }
                 }
             },
             orderBy: { name: 'asc' },
@@ -43,7 +43,7 @@ export default async function CRMClients({ searchParams }: { searchParams: { q?:
             include: {
                 appointments: {
                     orderBy: { startAt: 'desc' },
-                    include: { service: true, staff: true }
+                    include: { serviceOption: { include: { service: true } }, staff: true }
                 }
             }
         });
@@ -93,7 +93,7 @@ export default async function CRMClients({ searchParams }: { searchParams: { q?:
                                     <div className="text-right">
                                         <p className="text-slate-400 text-xs uppercase font-bold tracking-tighter">Último Serviço Realizado</p>
                                         <p className="font-bold text-primary text-xs mt-1">
-                                            {lastAppointment ? lastAppointment.service.name : '-'}
+                                            {lastAppointment ? lastAppointment.serviceOption.service.name : '-'}
                                         </p>
                                     </div>
                                 </div>
@@ -154,7 +154,7 @@ export default async function CRMClients({ searchParams }: { searchParams: { q?:
                                         {selectedClient.appointments.map(app => (
                                             <div key={app.id} className="p-4 rounded-lg border border-slate-100 dark:border-slate-700 bg-white dark:bg-slate-800">
                                                 <div className="flex justify-between items-start mb-2">
-                                                    <span className="font-semibold text-slate-800 dark:text-slate-200">{app.service.name}</span>
+                                                    <span className="font-semibold text-slate-800 dark:text-slate-200">{app.serviceOption.service.name} <span className="text-xs text-slate-500 font-normal">({app.serviceOption.type === 'APPLICATION' ? 'Aplicação' : 'Manutenção'})</span></span>
                                                     <span className="text-xs font-semibold px-2 py-0.5 rounded-full bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300">
                                                         {app.status}
                                                     </span>

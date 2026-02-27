@@ -27,7 +27,7 @@ export async function GET(request: Request) {
             where,
             include: {
                 client: true,
-                service: true,
+                serviceOption: { include: { service: true } },
                 staff: true,
             },
             orderBy: { startAt: 'asc' }

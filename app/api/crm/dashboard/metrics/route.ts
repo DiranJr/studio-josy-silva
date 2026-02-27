@@ -58,10 +58,10 @@ export async function GET(request: Request) {
                 endAt: { lte: monthEnd },
                 status: { in: ['CONFIRMED', 'DONE'] }
             },
-            include: { service: true }
+            include: { serviceOption: true }
         })
 
-        const estimatedRevenue = monthAppointments.reduce((acc, appt) => acc + appt.service.priceCents, 0)
+        const estimatedRevenue = monthAppointments.reduce((acc, appt) => acc + appt.serviceOption.priceCents, 0)
 
         return NextResponse.json({
             todayAppointments,

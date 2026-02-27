@@ -18,13 +18,13 @@ export default async function CRMDashboard() {
             status: { in: ['PENDING_PAYMENT', 'CONFIRMED', 'DONE'] }
         },
         include: {
-            service: true
+            serviceOption: { include: { service: true } }
         }
     });
 
     const appointmentsTodayCount = appointmentsToday.length;
 
-    const estimatedRevenueCents = appointmentsToday.reduce((total, app) => total + app.service.priceCents, 0);
+    const estimatedRevenueCents = appointmentsToday.reduce((total, app) => total + app.serviceOption.priceCents, 0);
     const estimatedRevenue = new Intl.NumberFormat('pt-BR', {
         style: 'currency',
         currency: 'BRL'
@@ -39,7 +39,7 @@ export default async function CRMDashboard() {
         },
         orderBy: { startAt: 'asc' },
         take: 5,
-        include: { client: true, service: true }
+        include: { client: true, serviceOption: { include: { service: true } } }
     });
 
     return (
@@ -111,7 +111,12 @@ export default async function CRMDashboard() {
                                                         <span className="text-sm font-semibold text-slate-700 dark:text-slate-200">{app.client.name}</span>
                                                     </div>
                                                 </td>
-                                                <td className="px-6 py-4 text-sm text-slate-600 dark:text-slate-400">{app.service.name}</td>
+                                                <td className="px-6 py-4 text-sm text-slate-600 dark:text-slate-400">
+                                                    {app.serviceOption.service.name}
+                                                    <span className="block text-xs text-slate-400 mt-1">
+                                                        {app.serviceOption.type === 'APPLICATION' ? 'Aplicação' : 'Manutenção'}
+                                                    </span>
+                                                </td>
                                                 <td className="px-6 py-4 text-sm text-slate-600 dark:text-slate-400">
                                                     {format(new Date(app.startAt), "dd/MM 'às' HH:mm", { locale: ptBR })}
                                                 </td>

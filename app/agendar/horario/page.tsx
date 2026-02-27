@@ -206,7 +206,7 @@ function BookingClient() {
                         <div className="flex items-center gap-2 text-neutral-dark dark:text-slate-300">
                             <span className="material-symbols-outlined text-primary">info</span>
                             <span className="font-medium text-sm">
-                                Sinal de R$ {(serviceOption.depositCents / 100).toFixed(2)} necessário para confirmação.
+                                Taxa de Reserva: R$ {(serviceOption.depositCents / 100).toFixed(2)} necessário para confirmação.
                             </span>
                         </div>
                         <button

@@ -6,7 +6,7 @@ export async function GET(request: Request, { params }: { params: { id: string }
         const appointment = await prisma.appointment.findUnique({
             where: { id: params.id },
             include: {
-                service: true,
+                serviceOption: { include: { service: true } },
                 client: true,
                 staff: true
             }

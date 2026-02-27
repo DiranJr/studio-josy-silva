@@ -13,7 +13,7 @@ export async function GET(request: Request, { params }: { params: { id: string }
             where: { id: params.id },
             include: {
                 appointments: {
-                    include: { service: true, staff: true },
+                    include: { serviceOption: { include: { service: true } }, staff: true },
                     orderBy: { startAt: 'desc' }
                 }
             }

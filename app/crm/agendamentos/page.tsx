@@ -23,7 +23,7 @@ export default async function CRMAppointments({ searchParams }: { searchParams: 
         },
         include: {
             client: true,
-            service: true
+            serviceOption: { include: { service: true } }
         },
         orderBy: {
             startAt: 'asc'
@@ -65,7 +65,7 @@ export default async function CRMAppointments({ searchParams }: { searchParams: 
                                 <div key={app.id} className="flex gap-4 p-4 rounded-xl border border-slate-100 dark:border-slate-800 hover:border-primary/20 transition-colors shadow-sm bg-white dark:bg-slate-800">
                                     <div className="w-20 text-center shrink-0 flex flex-col justify-center border-r border-slate-100 dark:border-slate-700 pr-4">
                                         <p className="text-xl font-bold font-display text-slate-800 dark:text-slate-200">{format(new Date(app.startAt), "HH:mm")}</p>
-                                        <p className="text-xs text-slate-400">{app.service.durationMinutes} min</p>
+                                        <p className="text-xs text-slate-400">{app.serviceOption.durationMinutes} min</p>
                                     </div>
                                     <div className="flex-1 flex flex-col">
                                         <div className="flex justify-between items-start">
@@ -76,7 +76,7 @@ export default async function CRMAppointments({ searchParams }: { searchParams: 
                                                 </span>
                                             ) : app.status === 'PENDING_PAYMENT' ? (
                                                 <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-700 dark:bg-yellow-900/40 dark:text-yellow-400">
-                                                    <span className="material-symbols-outlined text-[14px]">schedule</span>Pendente Sinal
+                                                    <span className="material-symbols-outlined text-[14px]">schedule</span>Pendente Taxa de Reserva
                                                 </span>
                                             ) : app.status === 'CANCELLED' ? (
                                                 <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-700 dark:bg-red-900/40 dark:text-red-400">
@@ -88,7 +88,9 @@ export default async function CRMAppointments({ searchParams }: { searchParams: 
                                                 </span>
                                             )}
                                         </div>
-                                        <p className="text-slate-500 dark:text-slate-400 text-sm mt-1">{app.service.name}</p>
+                                        <p className="text-slate-500 dark:text-slate-400 text-sm mt-1">
+                                            {app.serviceOption.service.name} - {app.serviceOption.type === 'APPLICATION' ? 'Aplicação' : 'Manutenção'}
+                                        </p>
 
                                         <div className="mt-auto pt-4">
                                             <AppointmentActions appointmentId={app.id} currentStatus={app.status} />
