@@ -1,3 +1,6 @@
+export const runtime = "nodejs";
+export const dynamic = "force-dynamic";
+
 import { NextResponse } from 'next/server'
 import prisma from '@/lib/prisma'
 import bcrypt from 'bcryptjs'
@@ -20,9 +23,7 @@ export async function POST(request: Request) {
 
         const { email, password } = parsed.data
 
-        const user = await prisma.user.findUnique({
-            where: { email },
-        })
+        const user = await prisma.user.findUnique({ where: { email } })
 
         if (!user || !(await bcrypt.compare(password, user.passwordHash))) {
             return NextResponse.json({ error: 'Invalid credentials' }, { status: 401 })

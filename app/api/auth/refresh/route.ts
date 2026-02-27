@@ -1,3 +1,6 @@
+export const runtime = "nodejs";
+export const dynamic = "force-dynamic";
+
 import { NextResponse } from 'next/server'
 import { signAccessToken, verifyRefreshToken } from '@/lib/jwt'
 import { z } from 'zod'
