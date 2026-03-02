@@ -22,10 +22,6 @@ const ALL_TEMPLATES = [
     { id: 'pastel', name: 'Pastel', emoji: '🩷', desc: 'Pastéis suaves, delicado', bg: '#FFF9FB', accent: '#D4BFFF' },
 ]
 
-function getToken() {
-    return typeof window !== 'undefined' ? localStorage.getItem('crm_token') || '' : ''
-}
-
 type SiteData = {
     slug: string
     title: string
@@ -55,12 +51,11 @@ export default function MeuSitePage() {
 
     const load = useCallback(async () => {
         setLoading(true)
-        const token = getToken()
-        const headers = { Authorization: `Bearer ${token}` }
+        const headers = {}
         try {
             const [siteRes, sectionsRes] = await Promise.all([
-                fetch('/api/crm/site', { headers }),
-                fetch('/api/crm/sections', { headers }),
+                fetch('/api/crm/site', { credentials: 'include', headers }),
+                fetch('/api/crm/sections', { credentials: 'include', headers }),
             ])
             if (siteRes.ok) {
                 const d = await siteRes.json()
@@ -96,10 +91,9 @@ export default function MeuSitePage() {
         if (!form || slugError) return
         setSaving(true)
         setSaveMsg(null)
-        const token = getToken()
-        const res = await fetch('/api/crm/site', {
+                const res = await fetch('/api/crm/site', {
             method: 'PUT',
-            headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+            headers: { 'Content-Type': 'application/json',  },
             body: JSON.stringify(form)
         })
         setSaving(false)
@@ -118,10 +112,9 @@ export default function MeuSitePage() {
 
     async function applyTemplate(layoutId: string) {
         setLayoutSaving(true)
-        const token = getToken()
-        const res = await fetch('/api/crm/layout', {
+                const res = await fetch('/api/crm/layout', {
             method: 'PATCH',
-            headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+            headers: { 'Content-Type': 'application/json',  },
             body: JSON.stringify({ layout: layoutId })
         })
         setLayoutSaving(false)
@@ -146,7 +139,7 @@ export default function MeuSitePage() {
         setSections(next)
         await fetch('/api/crm/sections', {
             method: 'PUT',
-            headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${getToken()}` },
+            headers: { 'Content-Type': 'application/json',  },
             body: JSON.stringify(next.map((s, i) => ({ id: s.id, order: i })))
         })
         refreshPreview(next)
@@ -157,7 +150,7 @@ export default function MeuSitePage() {
         setSections(updated)
         await fetch('/api/crm/sections', {
             method: 'PUT',
-            headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${getToken()}` },
+            headers: { 'Content-Type': 'application/json',  },
             body: JSON.stringify({ id: sec.id, active: !sec.active })
         })
         refreshPreview(updated)
@@ -168,7 +161,7 @@ export default function MeuSitePage() {
         if (!editingSection) return
         await fetch('/api/crm/sections', {
             method: 'PUT',
-            headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${getToken()}` },
+            headers: { 'Content-Type': 'application/json',  },
             body: JSON.stringify({ id: editingSection.id, content: editingSection.content })
         })
         setEditingSection(null)

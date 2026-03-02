@@ -24,9 +24,7 @@ type Appointment = {
     serviceOption: { type: string; priceCents: number; service: { name: string } };
 };
 
-function getToken() {
-    return typeof window !== "undefined" ? localStorage.getItem("crm_token") || "" : "";
-}
+
 
 function fmtBRL(cents: number) {
     return (cents / 100).toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
@@ -60,7 +58,7 @@ export default function FinanceiroPage() {
         if (statusFilter) params.append("status", statusFilter);
 
         const res = await fetch(`/api/crm/financeiro?${params}`, {
-            headers: { Authorization: `Bearer ${getToken()}` },
+            credentials: 'include',
         });
         if (res.status === 401 || res.status === 403) { router.push("/login"); return; }
         const data = await res.json();

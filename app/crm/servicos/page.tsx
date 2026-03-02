@@ -25,9 +25,7 @@ function fmtBRL(cents: number) {
     return (cents / 100).toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
 }
 
-function getToken() {
-    return typeof window !== "undefined" ? localStorage.getItem("crm_token") || "" : "";
-}
+
 
 export default function ServicosPage() {
     const router = useRouter();
@@ -44,7 +42,7 @@ export default function ServicosPage() {
 
     const load = useCallback(async () => {
         const res = await fetch("/api/crm/services", {
-            headers: { Authorization: `Bearer ${getToken()}` },
+            credentials: 'include',
         });
         if (res.status === 401 || res.status === 403) { router.push("/login"); return; }
         setServices(await res.json());
@@ -57,7 +55,7 @@ export default function ServicosPage() {
         setSavingId(optionId);
         await fetch(`/api/crm/services/${serviceId}/options/${optionId}`, {
             method: "PATCH",
-            headers: { "Content-Type": "application/json", Authorization: `Bearer ${getToken()}` },
+            headers: { "Content-Type": "application/json" },
             body: JSON.stringify(data),
         });
         await load();
@@ -68,7 +66,7 @@ export default function ServicosPage() {
         setSavingId(service.id);
         await fetch(`/api/crm/services/${service.id}`, {
             method: "PATCH",
-            headers: { "Content-Type": "application/json", Authorization: `Bearer ${getToken()}` },
+            headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ active: !service.active }),
         });
         await load();
@@ -85,7 +83,7 @@ export default function ServicosPage() {
         };
         const res = await fetch("/api/crm/services", {
             method: "POST",
-            headers: { "Content-Type": "application/json", Authorization: `Bearer ${getToken()}` },
+            headers: { "Content-Type": "application/json" },
             body: JSON.stringify(payload),
         });
         if (res.ok) { setShowModal(false); await load(); }

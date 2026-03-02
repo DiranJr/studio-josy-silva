@@ -20,18 +20,17 @@ export default function LoginPage() {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ email, password }),
+                credentials: "include", // needed to receive Set-Cookie
             });
 
             const data = await res.json();
 
             if (!res.ok) {
-                throw new Error(data.error || "Erro ao fazer login");
+                throw new Error(data.error || "Credenciais inválidas");
             }
 
-            // Store token in cookie (for middleware) and localStorage (for API calls)
-            document.cookie = `auth-token=${data.accessToken}; path=/; max-age=86400; SameSite=Strict`;
-            localStorage.setItem("crm_token", data.accessToken);
-
+            // Token is now stored in HttpOnly cookie by the server.
+            // No localStorage, no JS-readable cookie.
             router.push("/crm");
             router.refresh();
         } catch (err: any) {

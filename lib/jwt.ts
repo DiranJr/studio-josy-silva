@@ -20,19 +20,17 @@ export function signRefreshToken(payload: JWTPayload) {
     return jwt.sign(payload, getSecret('REFRESH_SECRET'), { expiresIn: '7d' })
 }
 
-export function verifyAccessToken(token: string) {
+export function verifyAccessToken(token: string): JWTPayload | null {
     try {
-        const secret = process.env.JWT_SECRET || 'super-secret-jwt-key' // fallback for local dev
-        return jwt.verify(token, secret) as JWTPayload
+        return jwt.verify(token, getSecret('JWT_SECRET')) as JWTPayload
     } catch {
         return null
     }
 }
 
-export function verifyRefreshToken(token: string) {
+export function verifyRefreshToken(token: string): JWTPayload | null {
     try {
-        const secret = process.env.REFRESH_SECRET || 'super-secret-refresh-key'
-        return jwt.verify(token, secret) as JWTPayload
+        return jwt.verify(token, getSecret('REFRESH_SECRET')) as JWTPayload
     } catch {
         return null
     }

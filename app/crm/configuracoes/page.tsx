@@ -15,9 +15,6 @@ const WEEKDAYS_SHORT = ["Dom", "Seg", "Ter", "Qua", "Qui", "Sex", "Sáb"];
 type DayConfig = { weekday: number; active: boolean; startTime: string; endTime: string };
 type Block = { id: string; startAt: string; endAt: string; reason?: string };
 
-function getToken() {
-    return typeof window !== "undefined" ? localStorage.getItem("crm_token") || "" : "";
-}
 
 export default function ConfiguracoesPage() {
     const router = useRouter();
@@ -42,15 +39,14 @@ export default function ConfiguracoesPage() {
     const today = startOfDay(new Date());
 
     const loadStaffAndHours = useCallback(async () => {
-        const token = getToken();
-        const staffRes = await fetch("/api/crm/staff", { headers: { Authorization: `Bearer ${token}` } });
+        const staffRes = await fetch("/api/crm/staff", { credentials: 'include' });
         if (staffRes.status === 403 || staffRes.status === 401) { router.push("/login"); return; }
         if (staffRes.ok) {
             const staffList = await staffRes.json();
             if (staffList.length > 0) setStaffId(staffList[0].id);
         }
 
-        const res = await fetch("/api/crm/working-hours", { headers: { Authorization: `Bearer ${token}` } });
+        const res = await fetch("/api/crm/working-hours", { headers: {} });
         if (!res.ok) return;
         const existing: { weekday: number; startTime: string; endTime: string }[] = await res.json();
 
@@ -66,7 +62,7 @@ export default function ConfiguracoesPage() {
         const year = calendarMonth.getFullYear();
         const month = calendarMonth.getMonth() + 1;
         const res = await fetch(`/api/crm/blocks?year=${year}&month=${month}`, {
-            headers: { Authorization: `Bearer ${getToken()}` }
+            credentials: 'include'
         });
         if (res.ok) setBlockedDates(await res.json());
     }, [calendarMonth]);
@@ -87,7 +83,7 @@ export default function ConfiguracoesPage() {
         setSaving(true);
         const res = await fetch("/api/crm/working-hours", {
             method: "PUT",
-            headers: { "Content-Type": "application/json", Authorization: `Bearer ${getToken()}` },
+            headers: { "Content-Type": "application/json", },
             body: JSON.stringify({ staffId, hours: days }),
         });
         setSaving(false);
@@ -114,7 +110,7 @@ export default function ConfiguracoesPage() {
             setBlockSaving(true);
             await fetch(`/api/crm/blocks?id=${existingBlock.id}`, {
                 method: "DELETE",
-                headers: { Authorization: `Bearer ${getToken()}` }
+                credentials: 'include'
             });
             setBlockSaving(false);
         } else {
@@ -122,7 +118,7 @@ export default function ConfiguracoesPage() {
             setBlockSaving(true);
             await fetch("/api/crm/blocks", {
                 method: "POST",
-                headers: { "Content-Type": "application/json", Authorization: `Bearer ${getToken()}` },
+                headers: { "Content-Type": "application/json", },
                 body: JSON.stringify({
                     staffId,
                     startAt: day.toISOString(),
@@ -334,7 +330,7 @@ export default function ConfiguracoesPage() {
                                     onClick={async () => {
                                         setBlockSaving(true);
                                         await fetch(`/api/crm/blocks?id=${b.id}`, {
-                                            method: "DELETE", headers: { Authorization: `Bearer ${getToken()}` }
+                                            method: "DELETE", credentials: 'include'
                                         });
                                         setBlockSaving(false);
                                         await loadBlocks();
