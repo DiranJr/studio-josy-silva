@@ -2,87 +2,85 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import "@/app/crm/crm.css";
+
+const navLinks = [
+    { href: "/crm", icon: "📊", label: "Dashboard" },
+    { href: "/crm/agendamentos", icon: "📅", label: "Agendamentos" },
+    { href: "/crm/clientes", icon: "👥", label: "Clientes" },
+    { href: "/crm/servicos", icon: "✂️", label: "Serviços" },
+    { href: "/crm/financeiro", icon: "💰", label: "Financeiro" },
+    { href: "/crm/site", icon: "🌐", label: "Meu Site" },
+    { href: "/crm/configuracoes", icon: "⚙️", label: "Configurações" },
+];
 
 export default function CRMLayout({ children }: { children: React.ReactNode }) {
     const pathname = usePathname();
 
-    const isActive = (path: string) => {
-        return pathname === path ? "bg-white/20 rounded-xl" : "text-white/90 hover:bg-white/10 rounded-xl";
+    const getTitle = () => {
+        const link = navLinks.find(l => l.href === pathname);
+        return link ? link.label : "Dashboard";
     };
 
     return (
-        <div className="flex h-screen overflow-hidden bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-100 font-display">
-            {/* Sidebar */}
-            <aside className="w-64 bg-primary dark:bg-primary/80 flex flex-col shrink-0">
-                <div className="p-6 flex items-center gap-3">
-                    <div className="size-10 rounded-full bg-white flex items-center justify-center">
-                        <span className="material-symbols-outlined text-primary text-2xl font-bold">spa</span>
+        <div className="crm-shell">
+            {/* ── SIDEBAR ── */}
+            <aside className="crm-sidebar">
+                <a href="/" className="crm-sidebar-logo">
+                    <div className="crm-sidebar-logo-icon">A</div>
+                    <div className="crm-sidebar-logo-name">
+                        Agenda<span>Pro</span>
                     </div>
-                    <div className="flex flex-col">
-                        <h1 className="text-white text-base font-bold leading-tight">Studio Josy</h1>
-                        <p className="text-white/80 text-xs font-medium uppercase tracking-wider">CRM Management</p>
-                    </div>
-                </div>
-                <nav className="flex-1 px-4 mt-4 space-y-1">
-                    <Link href="/crm" className={`flex items-center gap-3 px-4 py-3 text-white transition-all ${isActive("/crm")}`}>
-                        <span className="material-symbols-outlined fill-1">dashboard</span>
-                        <span className="text-sm font-semibold">Dashboard</span>
-                    </Link>
-                    <Link href="/crm/agendamentos" className={`flex items-center gap-3 px-4 py-3 text-white transition-all ${isActive("/crm/agendamentos")}`}>
-                        <span className="material-symbols-outlined">calendar_today</span>
-                        <span className="text-sm font-medium">Agendamentos</span>
-                    </Link>
-                    <Link href="/crm/clientes" className={`flex items-center gap-3 px-4 py-3 text-white transition-all ${isActive("/crm/clientes")}`}>
-                        <span className="material-symbols-outlined">group</span>
-                        <span className="text-sm font-medium">Clientes</span>
-                    </Link>
-                    <Link href="/crm/servicos" className={`flex items-center gap-3 px-4 py-3 text-white transition-all ${isActive("/crm/servicos")}`}>
-                        <span className="material-symbols-outlined">content_cut</span>
-                        <span className="text-sm font-medium">Serviços</span>
-                    </Link>
-                    <Link href="/crm/financeiro" className={`flex items-center gap-3 px-4 py-3 text-white transition-all ${isActive("/crm/financeiro")}`}>
-                        <span className="material-symbols-outlined">payments</span>
-                        <span className="text-sm font-medium">Financeiro</span>
-                    </Link>
-                    <Link href="/crm/configuracoes" className={`flex items-center gap-3 px-4 py-3 text-white transition-all ${isActive("/crm/configuracoes")}`}>
-                        <span className="material-symbols-outlined">settings</span>
-                        <span className="text-sm font-medium">Configurações</span>
-                    </Link>
+                </a>
+
+                <div className="crm-sidebar-label">Menu</div>
+
+                <nav className="crm-nav">
+                    {navLinks.map(({ href, icon, label }) => (
+                        <Link
+                            key={href}
+                            href={href}
+                            className={`crm-nav-link${pathname === href ? " active" : ""}`}
+                        >
+                            <span className="crm-nav-icon">{icon}</span>
+                            {label}
+                        </Link>
+                    ))}
                 </nav>
-                <div className="p-4 mt-auto">
-                    <div className="bg-white/10 rounded-xl p-4">
-                        <p className="text-white/70 text-xs font-medium mb-1">Logado como</p>
-                        <p className="text-white text-sm font-bold">Josy Silva</p>
+
+                <div className="crm-sidebar-user">
+                    <div className="crm-user-avatar">A</div>
+                    <div>
+                        <div className="crm-user-name">Admin</div>
+                        <div className="crm-user-role">Administrador</div>
                     </div>
                 </div>
             </aside>
 
-            {/* Main Content Area */}
-            <main className="flex-1 flex flex-col min-w-0 bg-white dark:bg-background-dark overflow-y-auto">
-                {/* Header */}
-                <header className="h-16 flex items-center justify-between px-8 border-b border-slate-100 dark:border-slate-800 shrink-0 sticky top-0 bg-white/80 dark:bg-background-dark/80 backdrop-blur-md z-10">
-                    <div className="flex items-center gap-4">
-                        <h2 className="text-slate-800 dark:text-slate-100 text-lg font-bold">Olá, Josy Silva</h2>
-                    </div>
-                    <div className="flex items-center gap-4">
-                        <button className="relative p-2 text-slate-500 hover:bg-slate-50 dark:hover:bg-slate-900 rounded-lg transition-colors">
-                            <span className="material-symbols-outlined">notifications</span>
-                            <span className="absolute top-2 right-2 size-2 bg-primary rounded-full border-2 border-white dark:border-background-dark"></span>
+            {/* ── MAIN ── */}
+            <main className="crm-main">
+                {/* Topbar */}
+                <header className="crm-topbar">
+                    <div className="crm-topbar-title">{getTitle()}</div>
+                    <div className="crm-topbar-actions">
+                        <button className="crm-topbar-btn" title="Notificações">
+                            🔔
+                            <span className="crm-topbar-notif-dot" />
                         </button>
-                        <div className="flex items-center gap-3 pl-4 border-l border-slate-100 dark:border-slate-800">
-                            <div className="text-right">
-                                <p className="text-xs font-bold text-slate-900 dark:text-slate-100 leading-none">Josy Silva</p>
-                                <p className="text-[10px] text-slate-500 dark:text-slate-400 mt-1">Administradora</p>
+                        <div className="crm-topbar-user">
+                            <div className="crm-topbar-user-info">
+                                <div className="crm-topbar-user-name">Admin</div>
+                                <div className="crm-topbar-user-role">Administrador</div>
                             </div>
-                            <div className="size-9 rounded-full bg-primary text-white flex items-center justify-center font-bold text-sm">
-                                JS
-                            </div>
+                            <div className="crm-topbar-avatar">A</div>
                         </div>
                     </div>
                 </header>
 
-                {/* Page Content */}
-                {children}
+                {/* Page content */}
+                <div className="crm-page">
+                    {children}
+                </div>
             </main>
         </div>
     );

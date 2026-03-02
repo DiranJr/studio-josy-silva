@@ -49,7 +49,7 @@ export default function LoginPage() {
                         <span className="material-symbols-outlined text-3xl">spa</span>
                     </div>
                     <h2 className="text-2xl font-extrabold text-slate-900 dark:text-white">Acesso CRM</h2>
-                    <p className="text-sm text-slate-500 mt-1">Studio Josy Silva</p>
+                    <p className="text-sm text-slate-500 mt-1">AgendaPro Gestão</p>
                 </div>
 
                 <form onSubmit={handleSubmit} className="p-8 space-y-6">

@@ -91,135 +91,126 @@ export default function ServicosPage() {
         if (res.ok) { setShowModal(false); await load(); }
     }
 
-    if (loading) return <div className="flex-1 flex items-center justify-center text-slate-400">Carregando...</div>;
+    if (loading) return (
+        <div className="crm-empty">
+            <div className="crm-empty-icon">⏳</div>
+            <div className="crm-empty-title">Carregando serviços...</div>
+        </div>
+    );
 
     return (
-        <div className="p-8 max-w-5xl mx-auto w-full">
-            <div className="flex items-center justify-between mb-8">
-                <div>
-                    <h1 className="text-2xl font-extrabold text-slate-800">Gerenciar Serviços</h1>
-                    <p className="text-slate-500 text-sm mt-1">Edite preços e horários em tempo real — reflete imediatamente na homepage.</p>
+        <div style={{ maxWidth: 860, margin: '0 auto', width: '100%' }}>
+            <div className="crm-page-header">
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <div>
+                        <h1 className="crm-page-title">Serviços</h1>
+                        <p className="crm-page-subtitle">Edite preços e horários — reflete imediatamente no seu site.</p>
+                    </div>
+                    <button onClick={() => setShowModal(true)} className="crm-btn crm-btn-primary">
+                        + Novo Serviço
+                    </button>
                 </div>
-                <button
-                    onClick={() => setShowModal(true)}
-                    className="flex items-center gap-2 bg-primary text-white px-5 py-2.5 rounded-xl font-bold hover:bg-primary/90 transition-colors"
-                >
-                    <span className="material-symbols-outlined text-[18px]">add</span>
-                    Novo Serviço
-                </button>
             </div>
 
-            <div className="space-y-6">
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
                 {services.map((service) => (
-                    <div key={service.id} className={`bg-white border rounded-2xl shadow-sm overflow-hidden ${!service.active ? "opacity-60" : ""}`}>
-                        {/* Service header */}
-                        <div className="flex items-center justify-between px-6 py-4 border-b border-slate-100 bg-slate-50">
-                            <div className="flex items-center gap-3">
-                                <span className={`inline-block w-2.5 h-2.5 rounded-full ${service.active ? "bg-green-400" : "bg-slate-300"}`} />
+                    <div key={service.id} className="crm-card" style={{ opacity: service.active ? 1 : 0.6 }}>
+                        <div className="crm-card-header">
+                            <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                                <span style={{ width: 10, height: 10, borderRadius: '50%', background: service.active ? '#22C55E' : '#CBD5E1', display: 'inline-block', flexShrink: 0 }} />
                                 <div>
-                                    <h2 className="font-bold text-slate-800">{service.name}</h2>
-                                    <p className="text-xs text-slate-500">{service.category}</p>
+                                    <div className="crm-card-title">{service.name}</div>
+                                    <div style={{ fontSize: '.75rem', color: 'var(--text-light)', marginTop: 2 }}>{service.category}</div>
                                 </div>
                             </div>
                             <button
                                 onClick={() => toggleService(service)}
                                 disabled={savingId === service.id}
-                                className={`text-xs font-bold px-3 py-1.5 rounded-full transition-colors ${service.active
-                                    ? "bg-red-50 text-red-600 hover:bg-red-100"
-                                    : "bg-green-50 text-green-600 hover:bg-green-100"
-                                    }`}
-                            >
-                                {savingId === service.id ? "..." : service.active ? "Desativar" : "Ativar"}
+                                className="crm-btn"
+                                style={service.active
+                                    ? { background: '#FEE2E2', color: '#991B1B' }
+                                    : { background: '#DCFCE7', color: '#166534' }
+                                }>
+                                {savingId === service.id ? '...' : service.active ? 'Desativar' : 'Ativar'}
                             </button>
                         </div>
-
-                        {/* Options */}
-                        <div className="divide-y divide-slate-50">
+                        <div>
                             {service.options.map((opt) => (
                                 <OptionRow
                                     key={opt.id}
                                     option={opt}
                                     saving={savingId === opt.id}
-                                    onSave={(data) => updateOption(service.id, opt.id, data)}
+                                    onSave={(data: Partial<ServiceOption>) => updateOption(service.id, opt.id, data)}
                                     onToggle={() => updateOption(service.id, opt.id, { active: !opt.active })}
                                 />
                             ))}
                         </div>
                     </div>
                 ))}
+
+                {services.length === 0 && (
+                    <div className="crm-empty">
+                        <div className="crm-empty-icon">✂️</div>
+                        <div className="crm-empty-title">Nenhum serviço cadastrado</div>
+                        <div className="crm-empty-desc">Clique em "Novo Serviço" para adicionar.</div>
+                    </div>
+                )}
             </div>
 
             {/* Create modal */}
             {showModal && (
-                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4 backdrop-blur-sm">
-                    <div className="bg-white rounded-2xl shadow-2xl w-full max-w-lg overflow-hidden">
-                        <div className="px-6 pt-6 pb-4 border-b border-slate-100">
-                            <h2 className="text-xl font-extrabold text-slate-800">Novo Serviço</h2>
+                <div style={{ position: 'fixed', inset: 0, zIndex: 50, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(0,0,0,.5)', padding: 16, backdropFilter: 'blur(4px)' }}>
+                    <div style={{ background: 'white', borderRadius: 'var(--radius-xl)', boxShadow: 'var(--shadow-lg)', width: '100%', maxWidth: 520, overflow: 'hidden' }}>
+                        <div style={{ padding: '18px 24px', borderBottom: '1px solid var(--border)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                            <div style={{ fontSize: '1.05rem', fontWeight: 800, color: 'var(--text-dark)' }}>Novo Serviço</div>
+                            <button onClick={() => setShowModal(false)} style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: '1.2rem', color: 'var(--text-light)' }}>✕</button>
                         </div>
-                        <div className="p-6 space-y-4 max-h-[70vh] overflow-y-auto">
-                            <div className="grid grid-cols-2 gap-4">
-                                <div className="col-span-2">
-                                    <label className="text-xs font-bold text-slate-500 uppercase tracking-wider">Nome do Serviço</label>
-                                    <input className="mt-1 w-full border border-slate-200 rounded-xl px-4 py-2.5 text-slate-800 focus:outline-none focus:ring-2 focus:ring-primary/30"
-                                        value={form.name} onChange={e => setForm(f => ({ ...f, name: e.target.value }))} />
-                                </div>
-                                <div className="col-span-2">
-                                    <label className="text-xs font-bold text-slate-500 uppercase tracking-wider">Descrição</label>
-                                    <input className="mt-1 w-full border border-slate-200 rounded-xl px-4 py-2.5 text-slate-800 focus:outline-none focus:ring-2 focus:ring-primary/30"
-                                        value={form.description} onChange={e => setForm(f => ({ ...f, description: e.target.value }))} />
-                                </div>
-                                <div>
-                                    <label className="text-xs font-bold text-slate-500 uppercase tracking-wider">Categoria</label>
-                                    <select className="mt-1 w-full border border-slate-200 rounded-xl px-4 py-2.5 text-slate-800 focus:outline-none"
-                                        value={form.category} onChange={e => setForm(f => ({ ...f, category: e.target.value }))}>
-                                        <option value="Cilios">Cílios</option>
-                                        <option value="Outros">Outros</option>
-                                    </select>
+                        <div style={{ padding: '20px 24px', maxHeight: '65vh', overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: 14 }}>
+                            <div className="crm-form-group">
+                                <label className="crm-label">Nome do Serviço</label>
+                                <input className="crm-input" value={form.name} onChange={e => setForm(f => ({ ...f, name: e.target.value }))} placeholder="Ex: Volume Brasileiro" />
+                            </div>
+                            <div className="crm-form-group">
+                                <label className="crm-label">Descrição</label>
+                                <input className="crm-input" value={form.description} onChange={e => setForm(f => ({ ...f, description: e.target.value }))} />
+                            </div>
+                            <div className="crm-form-group">
+                                <label className="crm-label">Categoria</label>
+                                <select className="crm-input crm-select" value={form.category} onChange={e => setForm(f => ({ ...f, category: e.target.value }))}>
+                                    <option value="Cilios">Cílios</option>
+                                    <option value="Sobrancelha">Sobrancelha</option>
+                                    <option value="Outros">Outros</option>
+                                </select>
+                            </div>
+
+                            <div style={{ background: '#EDE9FE', borderRadius: 'var(--radius-md)', padding: '14px 16px' }}>
+                                <div style={{ fontSize: '.82rem', fontWeight: 800, color: 'var(--primary)', marginBottom: 10 }}>✨ Aplicação</div>
+                                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 10 }}>
+                                    <Field label="Duração (min)" type="number" value={form.applicationDurationMinutes} onChange={v => setForm(f => ({ ...f, applicationDurationMinutes: Number(v) }))} />
+                                    <Field label="Valor (R$)" type="number" value={form.applicationPriceCents / 100} onChange={v => setForm(f => ({ ...f, applicationPriceCents: Number(v) * 100 }))} />
+                                    <Field label="Taxa Reserva (R$)" type="number" value={form.applicationDepositCents / 100} onChange={v => setForm(f => ({ ...f, applicationDepositCents: Number(v) * 100 }))} />
                                 </div>
                             </div>
 
-                            <div className="bg-blue-50 rounded-xl p-4">
-                                <p className="font-bold text-blue-700 mb-3 text-sm">✨ Aplicação</p>
-                                <div className="grid grid-cols-3 gap-3">
-                                    <Field label="Duração (min)" type="number" value={form.applicationDurationMinutes}
-                                        onChange={v => setForm(f => ({ ...f, applicationDurationMinutes: Number(v) }))} />
-                                    <Field label="Valor (R$)" type="number" value={form.applicationPriceCents / 100}
-                                        onChange={v => setForm(f => ({ ...f, applicationPriceCents: Number(v) * 100 }))} />
-                                    <Field label="Taxa Reserva (R$)" type="number" value={form.applicationDepositCents / 100}
-                                        onChange={v => setForm(f => ({ ...f, applicationDepositCents: Number(v) * 100 }))} />
-                                </div>
-                            </div>
-
-                            <div className="flex items-center gap-3">
-                                <input type="checkbox" id="hasMaintenance" checked={form.includesMaintenance}
-                                    onChange={e => setForm(f => ({ ...f, includesMaintenance: e.target.checked }))}
-                                    className="accent-primary w-4 h-4" />
-                                <label htmlFor="hasMaintenance" className="text-sm font-semibold text-slate-700">Incluir opção de Manutenção</label>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                                <input type="checkbox" id="hasMaintenance" checked={form.includesMaintenance} onChange={e => setForm(f => ({ ...f, includesMaintenance: e.target.checked }))} style={{ accentColor: 'var(--primary)', width: 16, height: 16 }} />
+                                <label htmlFor="hasMaintenance" style={{ fontSize: '.875rem', fontWeight: 600, color: 'var(--text-dark)', cursor: 'pointer' }}>Incluir opção de Manutenção</label>
                             </div>
 
                             {form.includesMaintenance && (
-                                <div className="bg-purple-50 rounded-xl p-4">
-                                    <p className="font-bold text-purple-700 mb-3 text-sm">🔄 Manutenção</p>
-                                    <div className="grid grid-cols-3 gap-3">
-                                        <Field label="Duração (min)" type="number" value={form.maintenanceDurationMinutes}
-                                            onChange={v => setForm(f => ({ ...f, maintenanceDurationMinutes: Number(v) }))} />
-                                        <Field label="Valor (R$)" type="number" value={form.maintenancePriceCents / 100}
-                                            onChange={v => setForm(f => ({ ...f, maintenancePriceCents: Number(v) * 100 }))} />
-                                        <Field label="Taxa Reserva (R$)" type="number" value={form.maintenanceDepositCents / 100}
-                                            onChange={v => setForm(f => ({ ...f, maintenanceDepositCents: Number(v) * 100 }))} />
+                                <div style={{ background: '#F5F3FF', borderRadius: 'var(--radius-md)', padding: '14px 16px' }}>
+                                    <div style={{ fontSize: '.82rem', fontWeight: 800, color: 'var(--primary)', marginBottom: 10 }}>🔄 Manutenção</div>
+                                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 10 }}>
+                                        <Field label="Duração (min)" type="number" value={form.maintenanceDurationMinutes} onChange={v => setForm(f => ({ ...f, maintenanceDurationMinutes: Number(v) }))} />
+                                        <Field label="Valor (R$)" type="number" value={form.maintenancePriceCents / 100} onChange={v => setForm(f => ({ ...f, maintenancePriceCents: Number(v) * 100 }))} />
+                                        <Field label="Taxa Reserva (R$)" type="number" value={form.maintenanceDepositCents / 100} onChange={v => setForm(f => ({ ...f, maintenanceDepositCents: Number(v) * 100 }))} />
                                     </div>
                                 </div>
                             )}
                         </div>
-                        <div className="flex gap-3 px-6 py-4 border-t border-slate-100">
-                            <button onClick={() => setShowModal(false)}
-                                className="flex-1 py-2.5 rounded-xl border border-slate-200 text-slate-600 font-bold hover:bg-slate-50">
-                                Cancelar
-                            </button>
-                            <button onClick={createService}
-                                className="flex-1 py-2.5 rounded-xl bg-primary text-white font-bold hover:bg-primary/90">
-                                Criar Serviço
-                            </button>
+                        <div style={{ display: 'flex', gap: 10, padding: '14px 24px', borderTop: '1px solid var(--border)' }}>
+                            <button onClick={() => setShowModal(false)} className="crm-btn crm-btn-ghost" style={{ flex: 1, justifyContent: 'center' }}>Cancelar</button>
+                            <button onClick={createService} className="crm-btn crm-btn-primary" style={{ flex: 1, justifyContent: 'center' }}>Criar Serviço</button>
                         </div>
                     </div>
                 </div>
@@ -231,9 +222,8 @@ export default function ServicosPage() {
 function Field({ label, type, value, onChange }: { label: string; type: string; value: any; onChange: (v: string) => void }) {
     return (
         <div>
-            <label className="text-xs font-bold text-slate-500 uppercase tracking-wider block mb-1">{label}</label>
-            <input type={type} className="w-full border border-slate-200 rounded-lg px-3 py-2 text-slate-800 focus:outline-none focus:ring-2 focus:ring-primary/30"
-                value={value} onChange={e => onChange(e.target.value)} step={type === "number" ? "0.01" : undefined} />
+            <label className="crm-label">{label}</label>
+            <input type={type} className="crm-input" value={value} onChange={e => onChange(e.target.value)} step={type === "number" ? "0.01" : undefined} />
         </div>
     );
 }
@@ -249,65 +239,59 @@ function OptionRow({ option, saving, onSave, onToggle }: {
     const [editing, setEditing] = useState(false);
 
     function save() {
-        onSave({
-            priceCents: Math.round(parseFloat(price) * 100),
-            durationMinutes: parseInt(duration),
-            depositCents: Math.round(parseFloat(deposit) * 100),
-        });
+        onSave({ priceCents: Math.round(parseFloat(price) * 100), durationMinutes: parseInt(duration), depositCents: Math.round(parseFloat(deposit) * 100) });
         setEditing(false);
     }
 
-    const label = option.type === "APPLICATION" ? "✨ Aplicação" : "🔄 Manutenção";
-    const color = option.type === "APPLICATION" ? "text-blue-700 bg-blue-50" : "text-purple-700 bg-purple-50";
+    const isApp = option.type === "APPLICATION";
+    const tagBg = isApp ? '#EDE9FE' : '#F5F3FF';
+    const tagColor = isApp ? 'var(--primary)' : '#7E22CE';
+    const label = isApp ? '✨ Aplicação' : '🔄 Manutenção';
 
     return (
-        <div className={`px-6 py-4 flex flex-col sm:flex-row sm:items-center gap-4 ${!option.active ? "bg-slate-50 opacity-60" : ""}`}>
-            <span className={`text-xs font-bold px-3 py-1 rounded-full w-fit ${color}`}>{label}</span>
+        <div style={{ padding: '12px 20px', borderBottom: '1px solid var(--bg)', display: 'flex', alignItems: 'center', gap: 12, flexWrap: 'wrap', background: option.active ? 'white' : 'var(--bg)', opacity: option.active ? 1 : 0.65 }}>
+            <span style={{ background: tagBg, color: tagColor, fontSize: '.72rem', fontWeight: 700, padding: '4px 12px', borderRadius: 100, flexShrink: 0 }}>{label}</span>
 
             {editing ? (
-                <div className="flex flex-wrap gap-3 flex-1">
-                    <InputField label="Duração (min)" value={duration} onChange={setDuration} />
-                    <InputField label="Valor (R$)" value={price} onChange={setPrice} />
-                    <InputField label="Taxa Reserva (R$)" value={deposit} onChange={setDeposit} />
+                <div style={{ display: 'flex', gap: 10, flex: 1, flexWrap: 'wrap' }}>
+                    <div style={{ minWidth: 80 }}>
+                        <div style={{ fontSize: '.65rem', fontWeight: 700, color: 'var(--text-light)', textTransform: 'uppercase', letterSpacing: '.06em', marginBottom: 3 }}>Duração (min)</div>
+                        <input type="number" className="crm-input" value={duration} onChange={e => setDuration(e.target.value)} style={{ padding: '6px 10px', fontSize: '.82rem' }} />
+                    </div>
+                    <div style={{ minWidth: 80 }}>
+                        <div style={{ fontSize: '.65rem', fontWeight: 700, color: 'var(--text-light)', textTransform: 'uppercase', letterSpacing: '.06em', marginBottom: 3 }}>Valor (R$)</div>
+                        <input type="number" className="crm-input" value={price} onChange={e => setPrice(e.target.value)} step="0.01" style={{ padding: '6px 10px', fontSize: '.82rem' }} />
+                    </div>
+                    <div style={{ minWidth: 80 }}>
+                        <div style={{ fontSize: '.65rem', fontWeight: 700, color: 'var(--text-light)', textTransform: 'uppercase', letterSpacing: '.06em', marginBottom: 3 }}>Taxa (R$)</div>
+                        <input type="number" className="crm-input" value={deposit} onChange={e => setDeposit(e.target.value)} step="0.01" style={{ padding: '6px 10px', fontSize: '.82rem' }} />
+                    </div>
                 </div>
             ) : (
-                <div className="flex flex-wrap gap-6 flex-1 text-sm">
-                    <span className="text-slate-500">{duration} min</span>
-                    <span className="font-bold text-slate-800">R$ {price}</span>
-                    {parseFloat(deposit) > 0 && <span className="text-primary font-semibold">Taxa: R$ {deposit}</span>}
+                <div style={{ display: 'flex', gap: 20, flex: 1, alignItems: 'center', fontSize: '.875rem' }}>
+                    <span style={{ color: 'var(--text-mid)' }}>{duration} min</span>
+                    <span style={{ fontWeight: 700, color: 'var(--text-dark)' }}>R$ {price}</span>
+                    {parseFloat(deposit) > 0 && <span style={{ color: 'var(--primary)', fontWeight: 600 }}>Taxa: R$ {deposit}</span>}
                 </div>
             )}
 
-            <div className="flex gap-2 shrink-0">
+            <div style={{ display: 'flex', gap: 6, flexShrink: 0 }}>
                 {editing ? (
                     <>
-                        <button onClick={() => setEditing(false)} className="text-xs px-3 py-1.5 rounded-lg border border-slate-200 text-slate-600 hover:bg-slate-50">Cancelar</button>
-                        <button onClick={save} disabled={saving} className="text-xs px-4 py-1.5 rounded-lg bg-primary text-white font-bold hover:bg-primary/90 disabled:opacity-50">
-                            {saving ? "Salvando..." : "Salvar"}
+                        <button onClick={() => setEditing(false)} className="crm-btn crm-btn-ghost" style={{ fontSize: '.78rem', padding: '5px 10px' }}>Cancelar</button>
+                        <button onClick={save} disabled={saving} className="crm-btn crm-btn-primary" style={{ fontSize: '.78rem', padding: '5px 12px' }}>
+                            {saving ? '...' : 'Salvar'}
                         </button>
                     </>
                 ) : (
                     <>
-                        <button onClick={() => setEditing(true)} className="text-xs px-3 py-1.5 rounded-lg border border-slate-200 text-slate-600 hover:bg-slate-50">
-                            <span className="material-symbols-outlined text-[14px]">edit</span>
-                        </button>
-                        <button onClick={onToggle} disabled={saving}
-                            className={`text-xs px-3 py-1.5 rounded-lg font-bold ${option.active ? "bg-red-50 text-red-500 hover:bg-red-100" : "bg-green-50 text-green-600 hover:bg-green-100"}`}>
-                            {option.active ? "Off" : "On"}
+                        <button onClick={() => setEditing(true)} className="crm-btn crm-btn-ghost" style={{ fontSize: '.78rem', padding: '5px 10px' }}>✏️ Editar</button>
+                        <button onClick={onToggle} disabled={saving} className="crm-btn" style={{ fontSize: '.78rem', padding: '5px 10px', background: option.active ? '#FEE2E2' : '#DCFCE7', color: option.active ? '#991B1B' : '#166534' }}>
+                            {option.active ? 'Off' : 'On'}
                         </button>
                     </>
                 )}
             </div>
-        </div>
-    );
-}
-
-function InputField({ label, value, onChange }: { label: string; value: string; onChange: (v: string) => void }) {
-    return (
-        <div>
-            <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">{label}</label>
-            <input className="mt-0.5 w-24 border border-slate-200 rounded-lg px-2 py-1.5 text-sm text-slate-800 focus:outline-none focus:ring-2 focus:ring-primary/30"
-                value={value} onChange={e => onChange(e.target.value)} type="number" step="0.01" />
         </div>
     );
 }

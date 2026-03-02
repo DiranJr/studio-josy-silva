@@ -90,34 +90,33 @@ export default function FinanceiroPage() {
     ];
 
     return (
-        <div className="p-8 max-w-6xl mx-auto w-full">
-            <div className="mb-8">
-                <h1 className="text-2xl font-extrabold text-slate-800">Financeiro</h1>
-                <p className="text-slate-500 text-sm mt-1">Controle de faturamento e agendamentos.</p>
+        <div style={{ maxWidth: 1000, margin: '0 auto', width: '100%' }}>
+            <div className="crm-page-header">
+                <h1 className="crm-page-title">Financeiro</h1>
+                <p className="crm-page-subtitle">Controle de faturamento e agendamentos por período.</p>
             </div>
 
             {/* Period filter */}
-            <div className="flex flex-wrap gap-3 mb-6 items-center">
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 10, marginBottom: 20, alignItems: 'center' }}>
                 {presetBtns.map(p => (
-                    <button key={p.key} onClick={() => applyPreset(p.key)}
-                        className={`px-4 py-2 rounded-xl text-sm font-bold transition-colors ${preset === p.key ? "bg-primary text-white" : "bg-white border border-slate-200 text-slate-600 hover:bg-slate-50"}`}>
+                    <button key={p.key} onClick={() => applyPreset(p.key)} className="crm-btn"
+                        style={preset === p.key
+                            ? { background: 'var(--primary)', color: 'white', border: 'none' }
+                            : { background: 'white', border: '1px solid var(--border)', color: 'var(--text-mid)' }}>
                         {p.label}
                     </button>
                 ))}
 
                 {preset === "custom" && (
-                    <div className="flex items-center gap-2 text-sm">
-                        <input type="date" value={from} onChange={e => setFrom(e.target.value)}
-                            className="border border-slate-200 rounded-xl px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary/30" />
-                        <span className="text-slate-400">até</span>
-                        <input type="date" value={to} onChange={e => setTo(e.target.value)}
-                            className="border border-slate-200 rounded-xl px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary/30" />
-                        <button onClick={load} className="bg-primary text-white px-4 py-2 rounded-xl font-bold">Filtrar</button>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: '.875rem' }}>
+                        <input type="date" value={from} onChange={e => setFrom(e.target.value)} className="crm-input" style={{ width: 'auto' }} />
+                        <span style={{ color: 'var(--text-light)' }}>até</span>
+                        <input type="date" value={to} onChange={e => setTo(e.target.value)} className="crm-input" style={{ width: 'auto' }} />
+                        <button onClick={load} className="crm-btn crm-btn-primary">Filtrar</button>
                     </div>
                 )}
 
-                <select value={statusFilter} onChange={e => setStatusFilter(e.target.value)}
-                    className="ml-auto border border-slate-200 rounded-xl px-4 py-2 text-sm text-slate-700 focus:outline-none">
+                <select value={statusFilter} onChange={e => setStatusFilter(e.target.value)} className="crm-input crm-select" style={{ marginLeft: 'auto', width: 'auto' }}>
                     <option value="">Todos os status</option>
                     <option value="CONFIRMED">Confirmados</option>
                     <option value="PENDING_PAYMENT">Pendentes</option>
@@ -128,34 +127,32 @@ export default function FinanceiroPage() {
             {/* Stat cards */}
             {stats && (
                 <>
-                    <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-                        <StatCard icon="payments" label="Receita Total" value={fmtBRL(stats.totalRevenueCents)} sub={`Confirmados`} color="primary" />
-                        <StatCard icon="calendar_check" label="Agendamentos" value={stats.confirmed.toString()} sub={`${stats.total} no total`} color="green" />
-                        <StatCard icon="receipt" label="Ticket Médio" value={fmtBRL(stats.averageTicketCents)} sub="Por serviço" color="blue" />
-                        <StatCard icon="lock" label="Taxas Cobradas" value={fmtBRL(stats.totalReservations)} sub="Reservas" color="purple" />
+                    <div className="crm-stats-grid" style={{ marginBottom: 20 }}>
+                        <StatCard icon="💰" label="Receita Total" value={fmtBRL(stats.totalRevenueCents)} sub={`Confirmados`} color="#EDE9FE" />
+                        <StatCard icon="📅" label="Agendamentos" value={stats.confirmed.toString()} sub={`${stats.total} no total`} color="#DCFCE7" />
+                        <StatCard icon="🏷️" label="Ticket Médio" value={fmtBRL(stats.averageTicketCents)} sub="Por serviço" color="#DBEAFE" />
+                        <StatCard icon="🔒" label="Taxas Cobradas" value={fmtBRL(stats.totalReservations)} sub="Reservas" color="#FCE7F3" />
                     </div>
 
                     {/* By service */}
                     {stats.byService.length > 0 && (
-                        <div className="bg-white border border-slate-100 rounded-2xl shadow-sm mb-6 overflow-hidden">
-                            <div className="px-6 py-4 border-b border-slate-100 bg-slate-50">
-                                <h2 className="font-bold text-slate-700">Receita por Serviço</h2>
-                            </div>
-                            <div className="divide-y divide-slate-50">
+                        <div className="crm-card" style={{ marginBottom: 20 }}>
+                            <div className="crm-card-header"><span className="crm-card-title">Receita por Serviço</span></div>
+                            <div>
                                 {stats.byService.map((s, i) => {
                                     const maxRevenue = stats.byService[0]?.revenueCents || 1;
                                     const pct = Math.round((s.revenueCents / maxRevenue) * 100);
                                     return (
-                                        <div key={i} className="px-6 py-4">
-                                            <div className="flex justify-between mb-1.5">
-                                                <span className="text-sm font-semibold text-slate-700">{s.name}</span>
-                                                <div className="flex gap-4 text-sm">
-                                                    <span className="text-slate-400">{s.count} atend.</span>
-                                                    <span className="font-bold text-slate-800">{fmtBRL(s.revenueCents)}</span>
+                                        <div key={i} style={{ padding: '12px 20px', borderBottom: '1px solid var(--border)' }}>
+                                            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 6, fontSize: '.875rem' }}>
+                                                <span style={{ fontWeight: 600, color: 'var(--text-dark)' }}>{s.name}</span>
+                                                <div style={{ display: 'flex', gap: 16 }}>
+                                                    <span style={{ color: 'var(--text-light)' }}>{s.count} atend.</span>
+                                                    <span style={{ fontWeight: 700, color: 'var(--text-dark)' }}>{fmtBRL(s.revenueCents)}</span>
                                                 </div>
                                             </div>
-                                            <div className="h-2 bg-slate-100 rounded-full overflow-hidden">
-                                                <div className="h-full bg-primary rounded-full transition-all" style={{ width: `${pct}%` }} />
+                                            <div style={{ height: 6, background: 'var(--border)', borderRadius: 100, overflow: 'hidden' }}>
+                                                <div style={{ height: '100%', background: 'var(--primary)', borderRadius: 100, width: `${pct}%`, transition: 'width .3s' }} />
                                             </div>
                                         </div>
                                     );
@@ -167,10 +164,10 @@ export default function FinanceiroPage() {
             )}
 
             {/* Appointments table */}
-            <div className="bg-white border border-slate-100 rounded-2xl shadow-sm overflow-hidden">
-                <div className="px-6 py-4 border-b border-slate-100 bg-slate-50 flex items-center justify-between">
-                    <h2 className="font-bold text-slate-700">Lista de Agendamentos</h2>
-                    <span className="text-sm text-slate-500">{appointments.length} registros</span>
+            <div className="crm-card">
+                <div className="crm-card-header">
+                    <span className="crm-card-title">Lista de Agendamentos</span>
+                    <span style={{ fontSize: '.8rem', color: 'var(--text-light)' }}>{appointments.length} registros</span>
                 </div>
                 {loading ? (
                     <div className="p-8 text-center text-slate-400">Carregando...</div>
@@ -219,20 +216,14 @@ export default function FinanceiroPage() {
 }
 
 function StatCard({ icon, label, value, sub, color }: { icon: string; label: string; value: string; sub: string; color: string }) {
-    const colors: Record<string, string> = {
-        primary: "bg-primary/10 text-primary",
-        green: "bg-green-100 text-green-600",
-        blue: "bg-blue-100 text-blue-600",
-        purple: "bg-purple-100 text-purple-600",
-    };
     return (
-        <div className="bg-white border border-slate-100 rounded-2xl shadow-sm p-5">
-            <div className={`w-10 h-10 rounded-xl flex items-center justify-center mb-3 ${colors[color]}`}>
-                <span className="material-symbols-outlined text-[20px]">{icon}</span>
+        <div className="crm-stat-card">
+            <div className="crm-stat-top">
+                <span className="crm-stat-label">{label}</span>
+                <div className="crm-stat-icon" style={{ background: color }}>{icon}</div>
             </div>
-            <p className="text-2xl font-extrabold text-slate-800">{value}</p>
-            <p className="text-xs font-bold text-slate-400 uppercase tracking-wider mt-0.5">{label}</p>
-            <p className="text-xs text-slate-400 mt-1">{sub}</p>
+            <div className="crm-stat-value" style={{ fontSize: '1.5rem' }}>{value}</div>
+            <div className="crm-stat-delta">{sub}</div>
         </div>
     );
 }

@@ -1,86 +1,345 @@
 import Link from "next/link";
-import Image from "next/image";
+import "@/app/landing.css";
 
-export default function SaaSLanding() {
+export default function Landing() {
     return (
-        <div className="min-h-screen bg-gray-50 selection:bg-primary/20">
-            {/* Header */}
-            <header className="bg-white/80 backdrop-blur-md sticky top-0 z-50 border-b border-gray-100">
-                <div className="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
-                    <div className="flex items-center gap-2 text-deep-text font-black text-xl tracking-tight">
-                        <span className="material-symbols-outlined text-primary text-3xl">auto_awesome</span>
-                        Beleza<span className="text-primary">Pro</span>
-                    </div>
-                    <div className="flex items-center gap-4">
-                        <Link href="/login" className="text-sm font-semibold text-gray-600 hover:text-primary transition">Login</Link>
-                        <Link href="/signup" className="bg-primary text-white px-6 py-2.5 rounded-full text-sm font-bold shadow-md shadow-primary/20 hover:-translate-y-0.5 transition-all">
-                            Criar meu site
-                        </Link>
+        <div>
+            {/* ─── HEADER ─────────────────────────────────────── */}
+            <header className="lp-header">
+                <div className="container lp-header-inner">
+                    <a href="/" className="lp-logo">
+                        <div className="lp-logo-icon">A</div>
+                        Agenda<span>Pro</span>
+                    </a>
+                    <nav className="lp-nav">
+                        <a href="#solution">Funcionalidades</a>
+                        <a href="#how">Como funciona</a>
+                        <a href="#pricing">Preços</a>
+                    </nav>
+                    <div className="lp-header-cta">
+                        <Link href="/login" className="btn-ghost">Entrar</Link>
+                        <Link href="/signup" className="btn-primary">Testar grátis</Link>
                     </div>
                 </div>
             </header>
 
-            {/* Hero */}
-            <main>
-                <section className="pt-24 pb-32 px-6 text-center overflow-hidden relative">
-                    {/* Decorators */}
-                    <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-primary/5 rounded-full blur-3xl -z-10" />
+            {/* ─── HERO ───────────────────────────────────────── */}
+            <section className="lp-hero">
+                <div className="container">
+                    <div className="badge">✨ Agenda + Site + CRM em um só lugar</div>
 
-                    <div className="max-w-4xl mx-auto">
-                        <span className="inline-flex items-center gap-2 bg-primary/10 text-primary font-bold text-xs uppercase tracking-widest px-4 py-2 rounded-full mb-8">
-                            A Plataforma Definitiva
-                        </span>
+                    <h1>
+                        Crie o site do seu salão e comece a receber{" "}
+                        <em>agendamentos online</em> em minutos.
+                    </h1>
 
-                        <h1 className="text-5xl md:text-7xl font-extrabold text-deep-text tracking-tight leading-[1.1] mb-8">
-                            Site pago + Agenda Online <br className="hidden md:block" />
-                            <span className="text-primary relative">
-                                para o seu Negócio.
-                                <svg className="absolute w-full h-3 -bottom-2 left-0 text-accent-pink opacity-50" viewBox="0 0 100 10" preserveAspectRatio="none"><path d="M0 5 Q 50 15 100 5" stroke="currentColor" strokeWidth="4" fill="none" /></svg>
-                            </span>
-                        </h1>
+                    <p>
+                        Agenda online, site profissional e CRM completo para profissionais
+                        de beleza — sem precisar de técnicos ou configurações difíceis.
+                    </p>
 
-                        <p className="text-xl text-gray-500 mb-12 max-w-2xl mx-auto leading-relaxed">
-                            Crie sua conta em 1 minuto. Seu site entra no ar automaticamente integrado com o CRM para profissionais de beleza, sem configurações difíceis.
-                        </p>
+                    <div className="lp-hero-ctas">
+                        <Link href="/signup" className="btn-primary btn-primary-lg">
+                            🚀 Testar grátis por 7 dias
+                        </Link>
+                        <a href="#how" className="btn-outline">
+                            ▶ Ver como funciona
+                        </a>
+                    </div>
+                    <p className="lp-hero-disclaimer">Sem cartão de crédito. Cancele quando quiser.</p>
 
-                        <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
-                            <Link href="/signup" className="w-full sm:w-auto bg-primary text-white px-10 py-4 rounded-xl text-lg font-bold shadow-xl shadow-primary/30 hover:bg-primary/90 hover:-translate-y-1 transition-all flex items-center justify-center gap-2">
-                                <span className="material-symbols-outlined">rocket_launch</span>
-                                Criar meu site agora
-                            </Link>
+                    {/* Mockup */}
+                    <div className="lp-mockup">
+                        <div className="lp-mockup-browser">
+                            <div className="browser-bar">
+                                <div className="browser-dots">
+                                    <div className="browser-dot browser-dot-r" />
+                                    <div className="browser-dot browser-dot-y" />
+                                    <div className="browser-dot browser-dot-g" />
+                                </div>
+                                <div className="browser-url">
+                                    studiojosy.<strong>agendapro.app</strong>
+                                </div>
+                            </div>
+                            <div className="browser-body">
+                                <div className="browser-left">
+                                    <div>
+                                        <h3>Studio Josy Silva</h3>
+                                        <p>Extensões de Cílios · Volume Brasileiro</p>
+                                    </div>
+                                    <div className="browser-left-btns">
+                                        <div className="mock-btn mock-btn-white">📅 Agendar horário</div>
+                                        <div className="mock-btn mock-btn-outline">💬 WhatsApp</div>
+                                    </div>
+                                </div>
+                                <div className="browser-right">
+                                    <h4>Serviços</h4>
+                                    {[
+                                        ["Volume Brasileiro", "R$ 140"],
+                                        ["Volume Egípcio", "R$ 130"],
+                                        ["Design de Sobrancelha", "R$ 45"],
+                                    ].map(([name, price]) => (
+                                        <div key={name} className="service-row">
+                                            <span className="service-row-name">{name}</span>
+                                            <span className="service-row-price">{price}</span>
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+                        </div>
+                        <div className="mockup-notification">
+                            <span className="notif-icon">🔔</span>
+                            <div>
+                                <div className="notif-title">Novo agendamento!</div>
+                                <div className="notif-sub">Ana Lima — Seg 10:00</div>
+                            </div>
                         </div>
                     </div>
-                </section>
+                </div>
+            </section>
 
-                {/* Features Highlights */}
-                <section className="py-24 bg-white border-y border-gray-100">
-                    <div className="max-w-7xl mx-auto px-6 grid md:grid-cols-3 gap-12">
-                        <div className="text-center">
-                            <div className="w-16 h-16 rounded-2xl bg-pink-100 text-pink-600 flex items-center justify-center mx-auto mb-6 text-3xl">
-                                <span className="material-symbols-outlined text-inherit">web</span>
+            {/* ─── SOCIAL PROOF BAR ───────────────────────────── */}
+            <div className="lp-logos">
+                <div className="container">
+                    <p>Usado por profissionais em todo o Brasil</p>
+                    <div className="logos-row">
+                        {["Studio Josy ⭐⭐⭐⭐⭐", "Bianca Brow ⭐⭐⭐⭐⭐", "Nails by Mari ⭐⭐⭐⭐⭐", "Studio Camila ⭐⭐⭐⭐⭐"].map(n => (
+                            <div key={n} className="logo-item">{n}</div>
+                        ))}
+                    </div>
+                </div>
+            </div>
+
+            {/* ─── PROBLEM ────────────────────────────────────── */}
+            <section className="lp-problem">
+                <div className="container">
+                    <div className="section-label">😰 Você ainda sofre com isso?</div>
+                    <h2>
+                        Você perde clientes todos os dias<br />
+                        <em>sem perceber.</em>
+                    </h2>
+                    <div className="problem-grid">
+                        {[
+                            ["❌", "Clientes esquecem o horário marcado no WhatsApp"],
+                            ["❌", "Agenda no papel, sem histórico de clientes"],
+                            ["❌", "Não tem site com serviços e preços"],
+                            ["❌", "Perde agendamentos por falta de organização"],
+                            ["❌", "Sem noção real do quanto fatura por mês"],
+                            ["❌", "Dependente de indicações, sem presença online"],
+                        ].map(([icon, text]) => (
+                            <div key={text} className="problem-card">
+                                <span className="problem-icon">{icon}</span>
+                                <span className="problem-text">{text}</span>
                             </div>
-                            <h3 className="text-xl font-bold mb-3 text-deep-text">Site Instantâneo</h3>
-                            <p className="text-gray-500 leading-relaxed">Editor Live Preview. Altere fotos, textos e blocos do seu site público com um clique.</p>
+                        ))}
+                    </div>
+                </div>
+            </section>
+
+            {/* ─── SOLUTION ───────────────────────────────────── */}
+            <section id="solution" className="lp-solution">
+                <div className="container">
+                    <div className="section-header">
+                        <div className="badge">✅ Com AgendaPro você tem</div>
+                        <h2>
+                            Tudo que você precisa,<br />
+                            <em>em um só lugar.</em>
+                        </h2>
+                        <p>A solução completa para profissionais de beleza organizarem e crescerem seu negócio.</p>
+                    </div>
+                    <div className="features-grid">
+                        {[
+                            { icon: "📅", color: "#EDE9FE", title: "Agenda Online Automática", desc: "Clientes agendam pelo seu site 24h por dia. Sem você precisar responder mensagem por mensagem." },
+                            { icon: "🌐", color: "#FCE7F3", title: "Site Profissional Incluso", desc: "Seu site entra no ar em minutos com seus serviços, preços e galeria de fotos. Tudo editável." },
+                            { icon: "🔔", color: "#FEF3C7", title: "Lembretes Automáticos", desc: "Reduza faltas com confirmações automáticas para os seus clientes antes do horário." },
+                            { icon: "📊", color: "#DCFCE7", title: "CRM Completo", desc: "Histórico de clientes, controle financeiro e relatórios — tudo em um painel simples e bonito." },
+                        ].map(({ icon, color, title, desc }) => (
+                            <div key={title} className="feature-card">
+                                <div className="feature-icon-wrap" style={{ background: color }}>
+                                    {icon}
+                                </div>
+                                <h3>{title}</h3>
+                                <p>{desc}</p>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+            </section>
+
+            {/* ─── DIFFERENTIATOR ────────────────────────────── */}
+            <section className="lp-diff">
+                <div className="container">
+                    <div className="diff-inner">
+                        <div className="diff-text">
+                            <div className="badge">🔥 Seu maior diferencial</div>
+                            <h2>
+                                Você ganha um site profissional{" "}
+                                <em>automaticamente.</em>
+                            </h2>
+                            <p>
+                                Ao criar sua conta, seu site já entra no ar com seus serviços e
+                                preços. Edite textos, fotos e cores direto do seu painel — sem
+                                designer ou desenvolvedor.
+                            </p>
+                            <div className="diff-checklist">
+                                {[
+                                    "Página com serviços, preços e galeria de fotos",
+                                    "Botão de agendamento online integrado",
+                                    "Botão de WhatsApp direto no site",
+                                    "Link exclusivo: seunome.agendapro.app",
+                                    "Editor visual em tempo real no seu painel",
+                                ].map(item => (
+                                    <div key={item} className="diff-check">
+                                        <div className="check-circle">✓</div>
+                                        {item}
+                                    </div>
+                                ))}
+                            </div>
                         </div>
 
-                        <div className="text-center">
-                            <div className="w-16 h-16 rounded-2xl bg-purple-100 text-purple-600 flex items-center justify-center mx-auto mb-6 text-3xl">
-                                <span className="material-symbols-outlined text-inherit">calendar_month</span>
+                        <div className="diff-visual">
+                            <div className="ba-card">
+                                <div className="ba-emoji">😰</div>
+                                <div className="ba-label ba-label-before">Antes</div>
+                                <div className="ba-desc">
+                                    WhatsApp bagunçado, agenda no papel, sem site, sem organização.
+                                    Perdendo clientes todo dia.
+                                </div>
                             </div>
-                            <h3 className="text-xl font-bold mb-3 text-deep-text">Agenda Online</h3>
-                            <p className="text-gray-500 leading-relaxed">Seu cliente agenda horários direto pelo site, liberando mais do seu tempo para focar no trabalho.</p>
-                        </div>
-
-                        <div className="text-center">
-                            <div className="w-16 h-16 rounded-2xl bg-emerald-100 text-emerald-600 flex items-center justify-center mx-auto mb-6 text-3xl">
-                                <span className="material-symbols-outlined text-inherit">monitoring</span>
+                            <div className="ba-arrow">↓</div>
+                            <div className="ba-card ba-card-after">
+                                <div className="ba-emoji">🚀</div>
+                                <div className="ba-label ba-label-after">Depois do AgendaPro</div>
+                                <div className="ba-desc">
+                                    <span className="ba-url">studiojosy.agendapro.app</span><br />
+                                    Site profissional + agenda online + CRM completo. Tudo automático!
+                                </div>
                             </div>
-                            <h3 className="text-xl font-bold mb-3 text-deep-text">CRM Completo</h3>
-                            <p className="text-gray-500 leading-relaxed">Tenha controle total do seu financeiro e serviços sem complicação nem planilhas.</p>
                         </div>
                     </div>
-                </section>
-            </main>
+                </div>
+            </section>
+
+            {/* ─── HOW IT WORKS ───────────────────────────────── */}
+            <section id="how" className="lp-how">
+                <div className="container">
+                    <div className="section-header">
+                        <div className="badge">⚡ Simples assim</div>
+                        <h2>
+                            Em 3 passos você está<br />
+                            <em>recebendo agendamentos.</em>
+                        </h2>
+                    </div>
+                    <div className="steps-row">
+                        {[
+                            { n: "1", icon: "👤", title: "Crie sua conta", desc: "Leva 2 minutos. Preencha seus dados básicos e já ganhe seu link exclusivo." },
+                            { n: "2", icon: "✏️", title: "Monte seu site", desc: "Adicione serviços, preços e fotos pelo painel. Editor visual em tempo real." },
+                            { n: "3", icon: "📅", title: "Receba agendamentos", desc: "Clientes marcam online no seu site. Você só aparece e atende." },
+                        ].map(({ n, icon, title, desc }) => (
+                            <div key={n} className="step-card">
+                                <div className="step-num-wrap">
+                                    <div className="step-icon">{icon}</div>
+                                    <div className="step-badge">{n}</div>
+                                </div>
+                                <h3>{title}</h3>
+                                <p>{desc}</p>
+                            </div>
+                        ))}
+                    </div>
+                    <div className="how-cta">
+                        <Link href="/signup" className="btn-primary btn-primary-lg">
+                            🚀 Criar minha conta grátis
+                        </Link>
+                    </div>
+                </div>
+            </section>
+
+            {/* ─── TESTIMONIALS ───────────────────────────────── */}
+            <section className="lp-testimonials">
+                <div className="container">
+                    <div className="section-header">
+                        <h2>O que nossos clientes dizem</h2>
+                    </div>
+                    <div className="testimonials-grid">
+                        {[
+                            { name: "Studio Josy Silva", loc: "Belém, PA", text: "Meu salão ficou muito mais organizado. Meus clientes adoraram poder marcar pelo site — não fico mais perdendo tempo no WhatsApp.", init: "J" },
+                            { name: "Bianca Brow Studio", loc: "São Paulo, SP", text: "Em menos de 1 semana já tinha clientes novos marcando pelo meu site. A agenda automática é incrível, economizo horas todo dia.", init: "B" },
+                            { name: "Studio Maria Nails", loc: "Rio de Janeiro, RJ", text: "Nunca imaginei ter um site profissional tão rápido. O CRM me ajuda a ver o quanto estou faturando e a planejar melhor.", init: "M" },
+                        ].map(({ name, loc, text, init }) => (
+                            <div key={name} className="testimonial-card">
+                                <div className="stars">★★★★★</div>
+                                <p className="testimonial-text">"{text}"</p>
+                                <div className="testimonial-author">
+                                    <div className="author-avatar">{init}</div>
+                                    <div>
+                                        <div className="author-name">{name}</div>
+                                        <div className="author-loc">{loc}</div>
+                                    </div>
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+            </section>
+
+            {/* ─── PRICING ────────────────────────────────────── */}
+            <section id="pricing" className="lp-pricing">
+                <div className="container">
+                    <div className="section-header">
+                        <div className="badge">💰 Preço simples</div>
+                        <h2>Um plano. <em>Sem surpresas.</em></h2>
+                        <p>7 dias grátis. Cancele quando quiser.</p>
+                    </div>
+                    <div className="pricing-card">
+                        <div className="pricing-badge">✨ Mais popular</div>
+                        <div className="pricing-plan">Plano Profissional</div>
+                        <div className="pricing-price">R$49</div>
+                        <div className="pricing-period">/mês</div>
+                        <div className="pricing-annual">ou R$490/ano (economize 2 meses)</div>
+                        <ul className="pricing-list">
+                            <li>Site profissional completo</li>
+                            <li>Agenda online ilimitada</li>
+                            <li>CRM de clientes e financeiro</li>
+                            <li>Até 1.000 agendamentos/mês</li>
+                            <li>Link exclusivo do seu salão</li>
+                            <li>Editor visual do site</li>
+                            <li>Suporte via WhatsApp</li>
+                        </ul>
+                        <Link href="/signup" className="pricing-cta">Começar agora grátis 🚀</Link>
+                        <div className="pricing-disclaimer">Sem cartão de crédito. Cancele quando quiser.</div>
+                    </div>
+                </div>
+            </section>
+
+            {/* ─── CTA FINAL ──────────────────────────────────── */}
+            <section className="lp-cta">
+                <div className="container">
+                    <div style={{ fontSize: "3.5rem", marginBottom: "24px" }}>🚀</div>
+                    <h2>
+                        Comece hoje e transforme a forma<br />
+                        <em>que você agenda seus clientes.</em>
+                    </h2>
+                    <p>Centenas de profissionais já usam o AgendaPro. Você pode ser a próxima.</p>
+                    <Link href="/signup" className="btn-primary btn-primary-lg">
+                        👤 Criar conta grátis
+                    </Link>
+                    <p className="lp-cta-note">Sem cartão de crédito · 7 dias grátis · Cancele quando quiser</p>
+                </div>
+            </section>
+
+            {/* ─── FOOTER ─────────────────────────────────────── */}
+            <footer className="lp-footer">
+                <div className="container lp-footer-inner">
+                    <a href="/" className="lp-footer-logo">
+                        A Agenda<span>Pro</span>
+                    </a>
+                    <p className="lp-footer-copy">© 2026 AgendaPro. Todos os direitos reservados.</p>
+                    <div className="lp-footer-links">
+                        <Link href="/login">Entrar</Link>
+                        <Link href="/signup">Cadastrar</Link>
+                    </div>
+                </div>
+            </footer>
         </div>
-    )
+    );
 }
