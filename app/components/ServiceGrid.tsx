@@ -14,7 +14,7 @@ const SERVICE_IMAGES: Record<string, string> = {
 const DEFAULT_IMAGE = "/service-brasileiro.jpg";
 
 
-export default function ServiceGrid({ services }: { services: any[] }) {
+export default function ServiceGrid({ services, tenantSlug }: { services: any[], tenantSlug: string }) {
     const [selectedService, setSelectedService] = useState<any>(null);
 
     const ciliосServices = services.filter((s) => s.category === "Cilios");
@@ -150,7 +150,7 @@ export default function ServiceGrid({ services }: { services: any[] }) {
                             {activeOptions(selectedService).map((opt: any) => (
                                 <Link
                                     key={opt.id}
-                                    href={`/agendar/horario?serviceOptionId=${opt.id}`}
+                                    href={`/${tenantSlug}/agendar/horario?serviceOptionId=${opt.id}`}
                                     className="flex items-center justify-between p-4 rounded-2xl border-2 border-primary/10 hover:border-primary hover:bg-primary/5 transition-all group"
                                 >
                                     <div>

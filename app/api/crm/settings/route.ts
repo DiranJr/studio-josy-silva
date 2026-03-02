@@ -11,12 +11,12 @@ export async function GET(request: Request) {
         const payload = verifyAccessToken(authHeader?.split(' ')[1] || '')
         if (!payload || payload.role !== 'ADMIN') return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
 
-        let settings = await prisma.settings.findFirst()
-        if (!settings) {
-            settings = await prisma.settings.create({ data: {} })
+        const tenant = await prisma.tenant.findUnique({ where: { id: payload.tenantId } })
+        if (!tenant) {
+            return NextResponse.json({ error: 'Tenant not found' }, { status: 404 })
         }
 
-        return NextResponse.json(settings)
+        return NextResponse.json(tenant)
     } catch (error) {
         return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 })
     }
@@ -43,12 +43,18 @@ export async function PATCH(request: Request) {
 
         if (!parsed.success) return NextResponse.json({ error: 'Invalid input' }, { status: 400 })
 
-        const settings = await prisma.settings.findFirst()
-        if (!settings) return NextResponse.json({ error: 'Settings not found' }, { status: 404 })
+        const tenant = await prisma.tenant.findUnique({ where: { id: payload.tenantId } })
+        if (!tenant) return NextResponse.json({ error: 'Tenant not found' }, { status: 404 })
 
-        const updated = await prisma.settings.update({
-            where: { id: settings.id },
-            data: parsed.data
+        const updateData: any = { ...parsed.data }
+        if (updateData.salonName !== undefined) {
+            updateData.name = updateData.salonName
+            delete updateData.salonName
+        }
+
+        const updated = await prisma.tenant.update({
+            where: { id: tenant.id },
+            data: updateData
         })
 
         return NextResponse.json(updated)
@@ -56,6 +62,3 @@ export async function PATCH(request: Request) {
         return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 })
     }
 }
-
-
-

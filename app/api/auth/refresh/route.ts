@@ -24,7 +24,7 @@ export async function POST(request: Request) {
         }
 
         // Optional: check if user still exists in DB
-        const newAccessToken = signAccessToken({ userId: payload.userId, role: payload.role })
+        const newAccessToken = signAccessToken({ userId: payload.userId, role: payload.role, tenantId: payload.tenantId })
 
         return NextResponse.json({ accessToken: newAccessToken })
     } catch (error) {

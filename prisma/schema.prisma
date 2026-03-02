@@ -9,8 +9,72 @@ datasource db {
   // directUrl = env("DIRECT_URL")
 }
 
+model Tenant {
+  id                String   @id @default(uuid())
+  name              String
+  slug              String   @unique
+  layout            String   @default("beauty")
+  logo              String?
+  primaryColor      String?
+  description       String?
+
+  // Settings globais do Tenant (antiga tabela Settings)
+  slotMinutes       Int      @default(15)
+  bufferMinutes     Int      @default(10)
+  minAdvanceMinutes Int      @default(120)
+  timezone          String   @default("America/Belem")
+  salonPhone        String?
+  salonAddress      String?
+
+  createdAt         DateTime @default(now())
+
+  users             User[]
+  clients           Client[]
+  services          Service[]
+  staffs            Staff[]
+  appointments      Appointment[]
+  payments          Payment[]
+  siteSettings      SiteSettings?
+  galleries         Gallery[]
+  siteSections      SiteSection[]
+}
+
+model SiteSettings {
+  id          String   @id @default(uuid())
+  tenantId    String   @unique
+  tenant      Tenant   @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  
+  title       String
+  description String
+  banner      String?
+  whatsapp    String?
+  instagram   String?
+}
+
+model Gallery {
+  id          String   @id @default(uuid())
+  tenantId    String
+  tenant      Tenant   @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  
+  imageUrl    String
+  createdAt   DateTime @default(now())
+}
+
+model SiteSection {
+  id          String   @id @default(uuid())
+  tenantId    String
+  tenant      Tenant   @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  
+  type        String   // banner, services, gallery, cta
+  content     Json
+  order       Int      @default(0)
+  active      Boolean  @default(true)
+}
+
 model User {
   id           String   @id @default(uuid())
+  tenantId     String
+  tenant       Tenant   @relation(fields: [tenantId], references: [id], onDelete: Cascade)
   name         String
   email        String   @unique
   passwordHash String
@@ -20,6 +84,8 @@ model User {
 
 model Client {
   id           String        @id @default(uuid())
+  tenantId     String
+  tenant       Tenant        @relation(fields: [tenantId], references: [id], onDelete: Cascade)
   name         String
   phone        String
   email        String?
@@ -30,6 +96,8 @@ model Client {
 
 model Service {
   id              String          @id @default(uuid())
+  tenantId        String
+  tenant          Tenant          @relation(fields: [tenantId], references: [id], onDelete: Cascade)
   name            String
   description     String?
   category        String          @default("Cilios")
@@ -41,8 +109,8 @@ model Service {
 model ServiceOption {
   id              String        @id @default(uuid())
   serviceId       String
-  service         Service       @relation(fields: [serviceId], references: [id])
-  type            String        // "APPLICATION" or "MAINTENANCE"
+  service         Service       @relation(fields: [serviceId], references: [id], onDelete: Cascade)
+  type            String        // "APPLICATION" ou "MAINTENANCE"
   durationMinutes Int
   priceCents      Int
   depositCents    Int           @default(0)
@@ -55,6 +123,8 @@ model ServiceOption {
 
 model Staff {
   id           String         @id @default(uuid())
+  tenantId     String
+  tenant       Tenant         @relation(fields: [tenantId], references: [id], onDelete: Cascade)
   name         String
   active       Boolean        @default(true)
   workingHours WorkingHours[]
@@ -65,25 +135,25 @@ model Staff {
 model WorkingHours {
   id        String @id @default(uuid())
   staffId   String
-  staff     Staff  @relation(fields: [staffId], references: [id])
+  staff     Staff  @relation(fields: [staffId], references: [id], onDelete: Cascade)
   weekday   Int    // 0 = Sunday, 1 = Monday, ..., 6 = Saturday
-  startTime String // Format HH:mm (e.g., "09:00")
-  endTime   String // Format HH:mm (e.g., "18:00")
+  startTime String // Formato HH:mm (ex: "09:00")
+  endTime   String // Formato HH:mm (ex: "18:00")
 }
 
 model Block {
   id      String   @id @default(uuid())
   staffId String
-  staff   Staff    @relation(fields: [staffId], references: [id])
+  staff   Staff    @relation(fields: [staffId], references: [id], onDelete: Cascade)
   startAt DateTime
   endAt   DateTime
   reason  String?
 }
 
-
-
 model Appointment {
   id              String            @id @default(uuid())
+  tenantId        String
+  tenant          Tenant            @relation(fields: [tenantId], references: [id], onDelete: Cascade)
   clientId        String
   client          Client            @relation(fields: [clientId], references: [id])
   serviceOptionId String
@@ -99,12 +169,12 @@ model Appointment {
   payments        Payment[]
 }
 
-
-
 model Payment {
   id            String        @id @default(uuid())
+  tenantId      String
+  tenant        Tenant        @relation(fields: [tenantId], references: [id], onDelete: Cascade)
   appointmentId String
-  appointment   Appointment   @relation(fields: [appointmentId], references: [id])
+  appointment   Appointment   @relation(fields: [appointmentId], references: [id], onDelete: Cascade)
   amountCents   Int
   method        String
   status        String @default("PENDING")
@@ -112,15 +182,4 @@ model Payment {
   providerRef   String?
   paidAt        DateTime?
   createdAt     DateTime      @default(now())
-}
-
-model Settings {
-  id                String @id @default(uuid())
-  slotMinutes       Int    @default(15)
-  bufferMinutes     Int    @default(10)
-  minAdvanceMinutes Int    @default(120)
-  timezone          String @default("America/Belem")
-  salonName         String @default("Studio Josy Silva")
-  salonAddress      String?
-  salonPhone        String?
 }

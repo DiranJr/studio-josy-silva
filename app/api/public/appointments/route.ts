@@ -10,6 +10,7 @@ const CreateAppointmentSchema = z.object({
     staffId: z.string().uuid().optional(),
     date: z.string(), // YYYY-MM-DD
     time: z.string(), // HH:mm
+    slug: z.string(),
     client: z.object({
         name: z.string().min(2),
         phone: z.string().min(10),
@@ -38,12 +39,14 @@ export async function POST(request: Request) {
             return NextResponse.json({ error: 'SERVICE_OPTION_INACTIVE' }, { status: 404 })
         }
 
-        const settings = await prisma.settings.findFirst()
-        if (!settings) return NextResponse.json({ error: 'Settings missing' }, { status: 500 })
+        const tenant = await prisma.tenant.findUnique({ where: { slug: data.slug } })
+        if (!tenant) return NextResponse.json({ error: 'Tenant missing' }, { status: 404 })
+
+        const settings = tenant
 
         let staffId = data.staffId
         if (!staffId) {
-            const staff = await prisma.staff.findFirst({ where: { active: true } })
+            const staff = await prisma.staff.findFirst({ where: { active: true, tenantId: tenant.id } })
             if (!staff) return NextResponse.json({ error: 'No active staff available' }, { status: 500 })
             staffId = staff.id
         }
@@ -77,9 +80,9 @@ export async function POST(request: Request) {
             return NextResponse.json({ error: 'SLOT_NOT_AVAILABLE' }, { status: 409 })
         }
 
-        // 3. Upsert Client (find by phone)
+        // 3. Upsert Client (find by phone and tenantId)
         const client = await prisma.client.findFirst({
-            where: { phone: data.client.phone }
+            where: { phone: data.client.phone, tenantId: tenant.id }
         })
 
         let clientId = client?.id
@@ -89,6 +92,7 @@ export async function POST(request: Request) {
                     name: data.client.name,
                     phone: data.client.phone,
                     email: data.client.email || null,
+                    tenantId: tenant.id
                 }
             })
             clientId = newClient.id
@@ -100,6 +104,7 @@ export async function POST(request: Request) {
 
         const appointment = await prisma.appointment.create({
             data: {
+                tenantId: tenant.id,
                 clientId,
                 serviceOptionId: serviceOption.id,
                 staffId,
@@ -133,6 +138,3 @@ export async function POST(request: Request) {
         return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 })
     }
 }
-
-
-

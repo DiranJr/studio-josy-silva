@@ -2,21 +2,20 @@ export const dynamic = "force-dynamic";
 
 import { NextResponse } from 'next/server'
 import prisma from '@/lib/prisma'
-import { verifyAccessToken } from '@/lib/jwt'
+import { getSessionFromRequest } from '@/lib/session'
 import { parseISO } from 'date-fns'
 
 export async function GET(request: Request) {
     try {
-        const authHeader = request.headers.get('authorization')
-        const payload = verifyAccessToken(authHeader?.split(' ')[1] || '')
-        if (!payload) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+        const session = getSessionFromRequest(request)
+        if (!session) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
         const { searchParams } = new URL(request.url)
         const fromStr = searchParams.get('from')
         const toStr = searchParams.get('to')
         const staffId = searchParams.get('staffId')
 
-        const where: any = {}
+        const where: any = { tenantId: session.tenantId }
         if (fromStr && toStr) {
             where.startAt = { gte: parseISO(fromStr) }
             where.endAt = { lte: parseISO(toStr) }

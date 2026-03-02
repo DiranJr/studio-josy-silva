@@ -2,16 +2,16 @@ export const dynamic = "force-dynamic";
 
 import { NextResponse } from 'next/server'
 import prisma from '@/lib/prisma'
-import { verifyAccessToken } from '@/lib/jwt'
+import { getSessionFromRequest } from '@/lib/session'
 import { z } from 'zod'
 
 export async function GET(request: Request) {
     try {
-        const authHeader = request.headers.get('authorization')
-        const payload = verifyAccessToken(authHeader?.split(' ')[1] || '')
-        if (!payload || payload.role !== 'ADMIN') return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
+        const session = getSessionFromRequest(request)
+        if (!session || session.role !== 'ADMIN') return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
 
         const services = await prisma.service.findMany({
+            where: { tenantId: session.tenantId },
             include: {
                 options: { orderBy: { type: 'asc' } }
             },
@@ -39,9 +39,8 @@ const CreateServiceSchema = z.object({
 
 export async function POST(request: Request) {
     try {
-        const authHeader = request.headers.get('authorization')
-        const payload = verifyAccessToken(authHeader?.split(' ')[1] || '')
-        if (!payload || payload.role !== 'ADMIN') return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
+        const session = getSessionFromRequest(request)
+        if (!session || session.role !== 'ADMIN') return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
 
         const body = await request.json()
         const parsed = CreateServiceSchema.safeParse(body)
@@ -71,7 +70,7 @@ export async function POST(request: Request) {
         }
 
         const newService = await prisma.service.create({
-            data: { name, description, category, options: { create: options } },
+            data: { name, description, category, tenantId: session.tenantId, options: { create: options } },
             include: { options: true }
         })
 

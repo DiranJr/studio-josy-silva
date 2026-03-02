@@ -28,7 +28,7 @@ export async function POST(request: Request) {
             return NextResponse.json({ error: 'Invalid credentials' }, { status: 401 })
         }
 
-        const payload = { userId: user.id, role: user.role }
+        const payload = { userId: user.id, role: user.role, tenantId: user.tenantId }
         const accessToken = signAccessToken(payload)
         const refreshToken = signRefreshToken(payload)
 

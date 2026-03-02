@@ -2,24 +2,24 @@ export const dynamic = "force-dynamic";
 
 import { NextResponse } from 'next/server'
 import prisma from '@/lib/prisma'
-import { verifyAccessToken } from '@/lib/jwt'
+import { getSessionFromRequest } from '@/lib/session'
 import { z } from 'zod'
 
 export async function GET(request: Request) {
     try {
-        const authHeader = request.headers.get('authorization')
-        const payload = verifyAccessToken(authHeader?.split(' ')[1] || '')
-        if (!payload || payload.role !== 'ADMIN') return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
+        const session = getSessionFromRequest(request)
+        if (!session || session.role !== 'ADMIN') return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
 
         const { searchParams } = new URL(request.url)
         const query = searchParams.get('query')
 
-        const where = query ? {
-            OR: [
+        const where: any = { tenantId: session.tenantId }
+        if (query) {
+            where.OR = [
                 { name: { contains: query, mode: 'insensitive' as const } },
                 { phone: { contains: query } }
             ]
-        } : {}
+        }
 
         const clients = await prisma.client.findMany({
             where,
@@ -44,9 +44,8 @@ const CreateClientSchema = z.object({
 
 export async function POST(request: Request) {
     try {
-        const authHeader = request.headers.get('authorization')
-        const payload = verifyAccessToken(authHeader?.split(' ')[1] || '')
-        if (!payload || payload.role !== 'ADMIN') return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
+        const session = getSessionFromRequest(request)
+        if (!session || session.role !== 'ADMIN') return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
 
         const body = await request.json()
         const parsed = CreateClientSchema.safeParse(body)
@@ -56,7 +55,7 @@ export async function POST(request: Request) {
         }
 
         const newClient = await prisma.client.create({
-            data: parsed.data
+            data: { ...parsed.data, tenantId: session.tenantId }
         })
 
         return NextResponse.json(newClient)

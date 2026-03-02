@@ -2,10 +2,10 @@
 
 import { useEffect, useState, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { format, addMonths, subMonths, startOfMonth, endOfMonth, eachDayOfInterval, isSameDay, parseISO, isBefore, startOfDay } from "date-fns";
+import { format, addMonths, subMonths, startOfMonth, endOfMonth, eachDayOfInterval, isSameDay, isBefore, startOfDay } from "date-fns";
 import { ptBR } from "date-fns/locale";
 
-function BookingClient() {
+function BookingClient({ tenantSlug }: { tenantSlug: string }) {
     const router = useRouter();
     const searchParams = useSearchParams();
     const serviceOptionId = searchParams.get("serviceOptionId");
@@ -20,11 +20,11 @@ function BookingClient() {
     // Fetch service Option details
     useEffect(() => {
         if (!serviceOptionId) {
-            router.push("/");
+            router.push(`/${tenantSlug}`);
             return;
         }
 
-        fetch("/api/public/services")
+        fetch(`/api/public/services?slug=${tenantSlug}`)
             .then((res) => res.json())
             .then((data) => {
                 // Find the specific option inside the services
@@ -42,11 +42,11 @@ function BookingClient() {
                 if (foundOption) {
                     setServiceOption(foundOption);
                 } else {
-                    router.push("/");
+                    router.push(`/${tenantSlug}`);
                 }
                 setLoading(false);
             });
-    }, [serviceOptionId, router]);
+    }, [serviceOptionId, router, tenantSlug]);
 
     // Fetch availability when date changes
     useEffect(() => {
@@ -56,7 +56,7 @@ function BookingClient() {
         setAvailableSlots([]);
         setSelectedSlot(null);
 
-        fetch(`/api/public/availability?serviceOptionId=${serviceOptionId}&date=${dateStr}`)
+        fetch(`/api/public/availability?serviceOptionId=${serviceOptionId}&date=${dateStr}&slug=${tenantSlug}`)
             .then((res) => res.json())
             .then((data) => {
                 if (data.availableSlots) {
@@ -64,7 +64,7 @@ function BookingClient() {
                 }
             })
             .catch(console.error);
-    }, [selectedDate, serviceOptionId]);
+    }, [selectedDate, serviceOptionId, tenantSlug]);
 
     const daysInMonth = eachDayOfInterval({
         start: startOfMonth(currentMonth),
@@ -78,8 +78,7 @@ function BookingClient() {
         if (!selectedDate || !selectedSlot) return;
 
         const dateStr = format(selectedDate, "yyyy-MM-dd");
-        // store in localStorage or URL
-        router.push(`/agendar/pagamento?serviceOptionId=${serviceOptionId}&date=${dateStr}&time=${selectedSlot}`);
+        router.push(`/${tenantSlug}/agendar/pagamento?serviceOptionId=${serviceOptionId}&date=${dateStr}&time=${selectedSlot}`);
     };
 
     const today = startOfDay(new Date());
@@ -95,10 +94,7 @@ function BookingClient() {
                         <div className="bg-primary p-2 rounded-lg text-white flex items-center justify-center">
                             <span className="material-symbols-outlined">auto_awesome</span>
                         </div>
-                        <h1 className="text-xl font-bold text-neutral-dark dark:text-slate-100 tracking-tight">Studio Josy Silva</h1>
-                    </div>
-                    <div className="h-10 w-10 rounded-full bg-primary/20 border-2 border-primary overflow-hidden">
-                        <img className="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCR9ct3ixLawOF6H3aB_KY4kTR2sYOLBiS0-5caaCi4PJS6uJKZPYLR-WVGWwV03NUNn1sBMAvuUY-9RFuk4pxulpGPo_UFx0Alpb6PQT4Z7EO29mTufAmNZ7IN04xe2vaiNXYAfeDddMCc_0rRiHc1BK3ckS_SFDJ6vnGiNvNbqpmZk-a-vh6UehmFdUqe4Yet1nbkjI9RaBPGZf1ezVI5PsbmdplEcmJacTM532coKEFtePRQKPpaUUVvkX-0SiY77f9nn7QGtqFi" alt="User profile" />
+                        <h1 className="text-xl font-bold text-neutral-dark dark:text-slate-100 tracking-tight capitalize">{tenantSlug.replace('-', ' ')}</h1>
                     </div>
                 </div>
             </header>
@@ -225,16 +221,16 @@ function BookingClient() {
             </main>
 
             <footer className="mt-auto py-8 text-center border-t border-primary/5">
-                <p className="text-sm text-primary/40 dark:text-primary-light/20">© 2026 Studio Josy Silva. Todos os direitos reservados.</p>
+                <p className="text-sm text-primary/40 dark:text-primary-light/20">© 2026 {tenantSlug.replace('-', ' ')}. Todos os direitos reservados.</p>
             </footer>
         </div>
     );
 }
 
-export default function BookingPage() {
+export default function BookingPage({ params }: { params: { slug: string } }) {
     return (
         <Suspense fallback={<div className="min-h-screen flex items-center justify-center">Carregando formulário...</div>}>
-            <BookingClient />
+            <BookingClient tenantSlug={params.slug} />
         </Suspense>
     );
 }

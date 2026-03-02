@@ -3,6 +3,7 @@ import jwt from 'jsonwebtoken'
 export interface JWTPayload {
     userId: string
     role: string
+    tenantId: string
 }
 
 function getSecret(name: string): string {

@@ -5,7 +5,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { format, parseISO } from "date-fns";
 import { ptBR } from "date-fns/locale";
 
-function PaymentClient() {
+function PaymentClient({ tenantSlug }: { tenantSlug: string }) {
     const router = useRouter();
     const searchParams = useSearchParams();
 
@@ -23,11 +23,11 @@ function PaymentClient() {
 
     useEffect(() => {
         if (!serviceOptionId || !dateStr || !timeStr) {
-            router.push("/");
+            router.push(`/${tenantSlug}`);
             return;
         }
 
-        fetch("/api/public/services")
+        fetch(`/api/public/services?slug=${tenantSlug}`)
             .then((res) => res.json())
             .then((data) => {
                 let foundOption = null;
@@ -44,11 +44,11 @@ function PaymentClient() {
                 if (foundOption) {
                     setServiceOption(foundOption);
                 } else {
-                    router.push("/");
+                    router.push(`/${tenantSlug}`);
                 }
                 setLoading(false);
             });
-    }, [serviceOptionId, dateStr, timeStr, router]);
+    }, [serviceOptionId, dateStr, timeStr, router, tenantSlug]);
 
     const handleConfirm = async () => {
         if (!name || !phone) {
@@ -60,15 +60,15 @@ function PaymentClient() {
         try {
             const startAt = new Date(`${dateStr}T${timeStr}:00`);
 
-            // We need an endpoint POST /api/public/appointments
-            // I'll assume we send: client: {name, phone, email}, serviceOptionId, startAt
             const res = await fetch("/api/public/appointments", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({
                     client: { name, phone, email },
+                    slug: tenantSlug,
                     serviceOptionId,
-                    startAt: startAt.toISOString(),
+                    date: dateStr,
+                    time: timeStr,
                 }),
             });
 
@@ -78,8 +78,7 @@ function PaymentClient() {
             }
 
             const data = await res.json();
-            // Redirect to confirmation specifying the appointment ID or just success
-            router.push(`/agendar/confirmacao?appointmentId=${data.appointment.id}`);
+            router.push(`/${tenantSlug}/agendar/confirmacao?appointmentId=${data.appointmentId}`);
         } catch (error: any) {
             console.error(error);
             alert(error.message);
@@ -99,7 +98,7 @@ function PaymentClient() {
                         <div className="size-10 bg-primary rounded-full flex items-center justify-center text-white">
                             <span className="material-symbols-outlined">auto_awesome</span>
                         </div>
-                        <h1 className="text-primary font-extrabold text-xl tracking-tight uppercase">Studio Josy Silva</h1>
+                        <h1 className="text-primary font-extrabold text-xl tracking-tight uppercase capitalize">{tenantSlug.replace('-', ' ')}</h1>
                     </div>
                 </div>
             </header>
@@ -199,10 +198,10 @@ function PaymentClient() {
     );
 }
 
-export default function PaymentPage() {
+export default function PaymentPage({ params }: { params: { slug: string } }) {
     return (
         <Suspense fallback={<div className="min-h-screen flex items-center justify-center">Carregando...</div>}>
-            <PaymentClient />
+            <PaymentClient tenantSlug={params.slug} />
         </Suspense>
     );
 }

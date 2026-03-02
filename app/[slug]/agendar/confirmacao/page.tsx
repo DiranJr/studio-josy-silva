@@ -6,11 +6,12 @@ import { redirect } from "next/navigation";
 
 export const dynamic = "force-dynamic";
 
-export default async function ConfirmationPage({ searchParams }: { searchParams: { appointmentId?: string } }) {
+export default async function ConfirmationPage({ params, searchParams }: { params: { slug: string }, searchParams: { appointmentId?: string } }) {
+    const { slug } = params;
     const { appointmentId } = searchParams;
 
     if (!appointmentId) {
-        redirect("/");
+        redirect(`/${slug}`);
     }
 
     const appointment = await prisma.appointment.findUnique({
@@ -19,15 +20,16 @@ export default async function ConfirmationPage({ searchParams }: { searchParams:
             serviceOption: { include: { service: true } },
             staff: true,
             client: true,
+            tenant: true
         },
     });
 
-    if (!appointment) {
+    if (!appointment || appointment.tenant.slug !== slug) {
         return (
             <div className="min-h-screen flex items-center justify-center bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-100 p-6">
                 <div className="text-center space-y-4">
                     <h1 className="text-2xl font-bold">Agendamento não encontrado</h1>
-                    <Link href="/" className="text-primary hover:underline">Zvoltar para o início</Link>
+                    <Link href={`/${slug}`} className="text-primary hover:underline">Voltar para o início</Link>
                 </div>
             </div>
         );
@@ -44,7 +46,7 @@ export default async function ConfirmationPage({ searchParams }: { searchParams:
                         <div className="size-10 bg-primary rounded-full flex items-center justify-center text-white">
                             <span className="material-symbols-outlined">auto_awesome</span>
                         </div>
-                        <h1 className="text-primary text-xl font-bold tracking-tight">Studio Josy Silva</h1>
+                        <h1 className="text-primary text-xl font-bold tracking-tight capitalize">{appointment.tenant.name}</h1>
                     </div>
                 </div>
             </header>
@@ -98,7 +100,7 @@ export default async function ConfirmationPage({ searchParams }: { searchParams:
                                     <span className="material-symbols-outlined text-primary/60 mt-1">location_on</span>
                                     <div>
                                         <p className="text-sm font-semibold text-primary/70 uppercase tracking-wider mb-1">Localização</p>
-                                        <p className="text-lg font-bold text-slate-800 dark:text-slate-200 leading-snug">Studio Josy Silva</p>
+                                        <p className="text-lg font-bold text-slate-800 dark:text-slate-200 leading-snug">{appointment.tenant.name}</p>
                                     </div>
                                 </div>
                             </div>
@@ -121,7 +123,7 @@ export default async function ConfirmationPage({ searchParams }: { searchParams:
 
                         {/* Action Buttons */}
                         <div className="flex flex-col md:flex-row gap-4 pt-4">
-                            <Link href="/" className="flex-1 bg-primary hover:bg-primary/90 text-white font-bold py-4 px-8 rounded-full shadow-lg shadow-primary/25 transition-all flex items-center justify-center gap-2">
+                            <Link href={`/${slug}`} className="flex-1 bg-primary hover:bg-primary/90 text-white font-bold py-4 px-8 rounded-full shadow-lg shadow-primary/25 transition-all flex items-center justify-center gap-2">
                                 <span className="material-symbols-outlined">home</span>
                                 Voltar ao Início
                             </Link>
